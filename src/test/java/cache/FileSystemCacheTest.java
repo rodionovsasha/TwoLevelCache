@@ -7,6 +7,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public class FileSystemCacheTest {
     private FileSystemCache<Integer, String> fileSystemCache;
 

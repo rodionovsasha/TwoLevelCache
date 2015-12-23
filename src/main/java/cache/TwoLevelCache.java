@@ -6,6 +6,10 @@ import cache.strategies.LRUStrategy;
 import cache.strategies.MRUStrategy;
 import java.io.Serializable;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public class TwoLevelCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType>{
     private final ICache<KeyType, ValueType> firstLevelCache;
     private final ICache<KeyType, ValueType> secondLevelCache;

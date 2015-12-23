@@ -3,6 +3,10 @@ package cache.strategies;
 import java.util.Comparator;
 import java.util.Map;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public class ComparatorImpl<KeyType> implements Comparator<KeyType> {
     private final Map<KeyType, Long> map;
 

@@ -6,6 +6,10 @@ import java.io.*;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public class FileSystemCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCache.class);
     private static final String CACHE_DIR = "cache";

@@ -3,6 +3,10 @@ package cache.strategies;
 import java.util.Map;
 import java.util.TreeMap;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public abstract class CacheStrategy<KeyType> {
     final Map<KeyType, Long> treeMap; // A TreeMap is sorted by keys.
     final TreeMap<KeyType, Long> sortedTree;

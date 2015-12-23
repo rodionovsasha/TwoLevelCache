@@ -3,6 +3,10 @@ package cache;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*
+ * Copyright (©) 2015. Rodionov Alexander
+ */
+
 public class MemoryCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
     private final ConcurrentHashMap<KeyType, ValueType> hashMap;
     private int capacity = CacheApp.MAX_CACHE_MEMORY_CAPACITY;
