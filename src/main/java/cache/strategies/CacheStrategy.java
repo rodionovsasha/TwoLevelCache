@@ -12,8 +12,8 @@ public abstract class CacheStrategy<KeyType> {
     final TreeMap<KeyType, Long> sortedTree;
 
     CacheStrategy() {
-        this.treeMap = new TreeMap<KeyType, Long>();
-        this.sortedTree = new TreeMap<KeyType, Long>(new ComparatorImpl<KeyType>(treeMap));
+        this.treeMap = new TreeMap<>();
+        this.sortedTree = new TreeMap<>(new ComparatorImpl<>(treeMap));
     }
 
     public abstract void putObject(KeyType key);

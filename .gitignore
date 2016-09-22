@@ -2,11 +2,5 @@
 /cache/
 /.gitignore*
 /*.iml
-*/logs/
-*/target/
-*.class
-
-# Package Files
-*.jar
-*.war
-*.ear
+/logs/
+/target/

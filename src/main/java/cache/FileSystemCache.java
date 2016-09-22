@@ -10,21 +10,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * Copyright (©) 2015. Rodionov Alexander
  */
 
-public class FileSystemCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
+class FileSystemCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCache.class);
     private static final String CACHE_DIR = "cache";
     private final ConcurrentHashMap<KeyType, String> hashMap;
     private int capacity = CacheApp.MAX_CACHE_FILE_CAPACITY;
 
-    public FileSystemCache() {
+    FileSystemCache() {
         createDirectory();
-        this.hashMap = new ConcurrentHashMap<KeyType, String>(this.capacity);
+        this.hashMap = new ConcurrentHashMap<>(this.capacity);
     }
 
-    public FileSystemCache(int maxCapacity) {
+    FileSystemCache(int maxCapacity) {
         createDirectory();
         this.capacity = maxCapacity;
-        this.hashMap = new ConcurrentHashMap<KeyType, String>(this.capacity);
+        this.hashMap = new ConcurrentHashMap<>(this.capacity);
     }
 
     private void createDirectory() {
@@ -47,7 +47,7 @@ public class FileSystemCache<KeyType extends Serializable, ValueType extends Ser
             try {
                 FileInputStream fileInput = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
                 objectInputStream = new ObjectInputStream(fileInput);
-                return (ValueType)objectInputStream.readObject();
+                return (ValueType) objectInputStream.readObject();
             } catch (Exception e){
                 LOGGER.error("Can't read a file." + fileName + ": " + e);
             } finally {

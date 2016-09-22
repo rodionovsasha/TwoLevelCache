@@ -20,7 +20,7 @@ public class MRUCacheTest {
 
     @Test
     public void shouldMoveObjectFromCacheTest() {
-        twoLevelCache = new TwoLevelCache<Integer, String>(2, 2, CacheApp.StrategyType.MRU);
+        twoLevelCache = new TwoLevelCache<>(2, 2, CacheApp.StrategyType.MRU);
 
         // i=3 - Most Recently Used - will be removed
         for (int i = 0; i < 4; i++) {

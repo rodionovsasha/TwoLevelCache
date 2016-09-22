@@ -23,29 +23,25 @@ public class TwoLevelCache<KeyType extends Serializable, ValueType extends Seria
 
     public TwoLevelCache(int memoryCapacity, int fileCapacity, CacheApp.StrategyType strategyType) {
         this.strategy = getStrategy(strategyType);
-        this.firstLevelCache = new MemoryCache<KeyType, ValueType>(memoryCapacity);
-        this.secondLevelCache = new FileSystemCache<KeyType, ValueType>(fileCapacity);
+        this.firstLevelCache = new MemoryCache<>(memoryCapacity);
+        this.secondLevelCache = new FileSystemCache<>(fileCapacity);
     }
 
     public TwoLevelCache(int memoryCapacity, int fileCapacity) {
-        this.firstLevelCache = new MemoryCache<KeyType, ValueType>(memoryCapacity);
-        this.secondLevelCache = new FileSystemCache<KeyType, ValueType>(fileCapacity);
+        this.firstLevelCache = new MemoryCache<>(memoryCapacity);
+        this.secondLevelCache = new FileSystemCache<>(fileCapacity);
     }
    
-    CacheStrategy<KeyType> getStrategy(CacheApp.StrategyType strategyType) {
+    private CacheStrategy<KeyType> getStrategy(CacheApp.StrategyType strategyType) {
         switch (strategyType) {
-            case LFU: {
-                return new LFUStrategy<KeyType>();
-            }
-            case LRU: {
-                return new LRUStrategy<KeyType>();
-            }
-            case MRU: {
-                return new MRUStrategy<KeyType>();
-            }
-            default: {
-                return new LFUStrategy<KeyType>();
-            }
+            case LFU:
+                return new LFUStrategy<>();
+            case LRU:
+                return new LRUStrategy<>();
+            case MRU:
+                return new MRUStrategy<>();
+            default:
+                return new LFUStrategy<>();
         }
     }
 
@@ -121,15 +117,15 @@ public class TwoLevelCache<KeyType extends Serializable, ValueType extends Seria
         return (firstLevelCache.hasEmptyPlace() || secondLevelCache.hasEmptyPlace());
     }
 
-    public ICache<KeyType, ValueType> getFirstLevelCache() {
+    ICache<KeyType, ValueType> getFirstLevelCache() {
         return firstLevelCache;
     }
 
-    public ICache<KeyType, ValueType> getSecondLevelCache() {
+    ICache<KeyType, ValueType> getSecondLevelCache() {
         return secondLevelCache;
     }
 
-    public CacheStrategy<KeyType> getStrategy() {
+    CacheStrategy<KeyType> getStrategy() {
         return strategy;
     }
 }

@@ -16,7 +16,7 @@ public class FileSystemCacheTest {
 
     @Before
     public void init() {
-        fileSystemCache = new FileSystemCache<Integer, String>();
+        fileSystemCache = new FileSystemCache<>();
     }
 
     @After
@@ -51,7 +51,7 @@ public class FileSystemCacheTest {
 
     @Test
     public void isEmptyPlaceTest() {
-        fileSystemCache = new FileSystemCache<Integer, String>(5);
+        fileSystemCache = new FileSystemCache<>(5);
         for (int i = 0; i < 4; i++) {
             fileSystemCache.putObjectIntoCache(i, "String " + i);
         }

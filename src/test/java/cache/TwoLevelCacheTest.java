@@ -16,7 +16,7 @@ public class TwoLevelCacheTest {
 
     @Before
     public void init() {
-        twoLevelCache = new TwoLevelCache<Integer, String>(1, 1);
+        twoLevelCache = new TwoLevelCache<>(1, 1);
     }
 
     @After

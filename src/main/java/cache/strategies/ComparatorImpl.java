@@ -7,10 +7,10 @@ import java.util.Map;
  * Copyright (©) 2015. Rodionov Alexander
  */
 
-public class ComparatorImpl<KeyType> implements Comparator<KeyType> {
+class ComparatorImpl<KeyType> implements Comparator<KeyType> {
     private final Map<KeyType, Long> map;
 
-    public ComparatorImpl(Map<KeyType, Long> map) {
+    ComparatorImpl(Map<KeyType, Long> map) {
         this.map = map;
     }
 

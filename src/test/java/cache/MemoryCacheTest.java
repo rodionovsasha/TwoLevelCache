@@ -16,7 +16,7 @@ public class MemoryCacheTest {
 
     @Before
     public void init() {
-        memoryCache = new MemoryCache<Integer, String>();
+        memoryCache = new MemoryCache<>();
     }
 
     @After
@@ -51,7 +51,7 @@ public class MemoryCacheTest {
 
     @Test
     public void isEmptyPlaceTest() {
-        memoryCache = new MemoryCache<Integer, String>(5);
+        memoryCache = new MemoryCache<>(5);
         for (int i = 0; i < 4; i++) {
             memoryCache.putObjectIntoCache(i, "String " + i);
         }

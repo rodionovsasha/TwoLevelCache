@@ -20,7 +20,7 @@ public class LFUCacheTest {
 
     @Test
     public void shouldMoveObjectFromCacheTest() {
-        twoLevelCache = new TwoLevelCache<Integer, String>(2, 2, CacheApp.StrategyType.LFU);
+        twoLevelCache = new TwoLevelCache<>(2, 2, CacheApp.StrategyType.LFU);
 
         twoLevelCache.putObjectIntoCache(0, "String 0");
         twoLevelCache.getObjectFromCache(0);

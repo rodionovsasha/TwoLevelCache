@@ -20,7 +20,7 @@ public class LRUCacheTest {
 
     @Test
     public void shouldMoveObjectFromCacheTest() {
-        twoLevelCache = new TwoLevelCache<Integer, String>(2, 2, CacheApp.StrategyType.LRU);
+        twoLevelCache = new TwoLevelCache<>(2, 2, CacheApp.StrategyType.LRU);
 
         // i=0 - Least Recently Used - will be removed
         for (int i = 0; i < 4; i++) {
