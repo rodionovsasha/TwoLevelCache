@@ -8,32 +8,32 @@ import java.util.TreeMap;
  */
 
 public abstract class CacheStrategy<KeyType> {
-    final Map<KeyType, Long> treeMap; // A TreeMap is sorted by keys.
-    final TreeMap<KeyType, Long> sortedTree;
+    final Map<KeyType, Long> objectsStorage;
+    final TreeMap<KeyType, Long> sortedObjectsStorage; //TreeMap is sorted by keys.
 
     CacheStrategy() {
-        this.treeMap = new TreeMap<>();
-        this.sortedTree = new TreeMap<>(new ComparatorImpl<>(treeMap));
+        this.objectsStorage = new TreeMap<>();
+        this.sortedObjectsStorage = new TreeMap<>(new ComparatorImpl<>(objectsStorage));
     }
 
     public abstract void putObject(KeyType key);
 
     public void removeObject(KeyType key) {
         if(isObjectPresent(key)) {
-            treeMap.remove(key);
+            objectsStorage.remove(key);
         }
     }
 
     public boolean isObjectPresent(KeyType key) {
-        return treeMap.containsKey(key);
+        return objectsStorage.containsKey(key);
     }
 
     public KeyType getUsedKey() {
-        sortedTree.putAll(treeMap);
-        return sortedTree.firstKey();
+        sortedObjectsStorage.putAll(objectsStorage);
+        return sortedObjectsStorage.firstKey();
     }
 
     public void clear() {
-        treeMap.clear();
+        objectsStorage.clear();
     }
 }

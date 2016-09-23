@@ -46,53 +46,53 @@ public class TwoLevelCache<KeyType extends Serializable, ValueType extends Seria
     }
 
     @Override
-    public synchronized void putObjectIntoCache(KeyType key, ValueType val) {
-        if (firstLevelCache.isObjectPresent(key) || firstLevelCache.hasEmptyPlace()) {
-            firstLevelCache.putObjectIntoCache(key, val);
-        } else if (secondLevelCache.isObjectPresent(key) || secondLevelCache.hasEmptyPlace()) {
-            secondLevelCache.putObjectIntoCache(key, val);
+    public synchronized void putObjectIntoCache(KeyType objectKey, ValueType objectValue) {
+        if (firstLevelCache.isObjectPresent(objectKey) || firstLevelCache.hasEmptyPlace()) {
+            firstLevelCache.putObjectIntoCache(objectKey, objectValue);
+        } else if (secondLevelCache.isObjectPresent(objectKey) || secondLevelCache.hasEmptyPlace()) {
+            secondLevelCache.putObjectIntoCache(objectKey, objectValue);
         } else {
             // Here we have full cache and have to replace object according to cache strategy.
-            replaceUsedKey(key, val);
+            replaceUsedKey(objectKey, objectValue);
         }
 
-        if (!strategy.isObjectPresent(key)) {
-            strategy.putObject(key);
+        if (!strategy.isObjectPresent(objectKey)) {
+            strategy.putObject(objectKey);
         }
     }
 
-    private void replaceUsedKey(KeyType key, ValueType val) {
+    private void replaceUsedKey(KeyType key, ValueType value) {
         KeyType usedKey = strategy.getUsedKey();
         if (firstLevelCache.isObjectPresent(usedKey)) {
             firstLevelCache.removeObjectFromCache(usedKey);
-            firstLevelCache.putObjectIntoCache(key, val);
+            firstLevelCache.putObjectIntoCache(key, value);
         } else {
             secondLevelCache.removeObjectFromCache(usedKey);
-            secondLevelCache.putObjectIntoCache(key, val);
+            secondLevelCache.putObjectIntoCache(key, value);
         }
     }
 
     @Override
-    public synchronized ValueType getObjectFromCache(KeyType key) {
-        if (firstLevelCache.isObjectPresent(key)) {
-            strategy.putObject(key);
-            return firstLevelCache.getObjectFromCache(key);
-        } else if (secondLevelCache.isObjectPresent(key)) {
-            strategy.putObject(key);
-            return secondLevelCache.getObjectFromCache(key);
+    public synchronized ValueType getObjectFromCache(KeyType objectKey) {
+        if (firstLevelCache.isObjectPresent(objectKey)) {
+            strategy.putObject(objectKey);
+            return firstLevelCache.getObjectFromCache(objectKey);
+        } else if (secondLevelCache.isObjectPresent(objectKey)) {
+            strategy.putObject(objectKey);
+            return secondLevelCache.getObjectFromCache(objectKey);
         }
         return null;
     }
 
     @Override
-    public synchronized void removeObjectFromCache(KeyType key) {
-        if (firstLevelCache.isObjectPresent(key)) {
-            firstLevelCache.removeObjectFromCache(key);
+    public synchronized void removeObjectFromCache(KeyType objectKey) {
+        if (firstLevelCache.isObjectPresent(objectKey)) {
+            firstLevelCache.removeObjectFromCache(objectKey);
         }
-        if (secondLevelCache.isObjectPresent(key)) {
-            secondLevelCache.removeObjectFromCache(key);
+        if (secondLevelCache.isObjectPresent(objectKey)) {
+            secondLevelCache.removeObjectFromCache(objectKey);
         }
-        strategy.removeObject(key);
+        strategy.removeObject(objectKey);
     }
 
     @Override
@@ -101,8 +101,8 @@ public class TwoLevelCache<KeyType extends Serializable, ValueType extends Seria
     }
 
     @Override
-    public boolean isObjectPresent(KeyType key) {
-        return (firstLevelCache.isObjectPresent(key) || secondLevelCache.isObjectPresent(key));
+    public boolean isObjectPresent(KeyType objectKey) {
+        return (firstLevelCache.isObjectPresent(objectKey) || secondLevelCache.isObjectPresent(objectKey));
     }
 
     @Override

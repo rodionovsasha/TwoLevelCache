@@ -14,13 +14,13 @@ package cache.strategies;
 
 public class MRUStrategy<KeyType> extends CacheStrategy<KeyType> {
     @Override
-    public void putObject(KeyType key) {
-        treeMap.put(key, System.nanoTime());
+    public void putObject(KeyType objectKey) {
+        objectsStorage.put(objectKey, System.nanoTime());
     }
 
     @Override
     public KeyType getUsedKey() {
-        sortedTree.putAll(treeMap);
-        return sortedTree.lastKey();
+        sortedObjectsStorage.putAll(objectsStorage);
+        return sortedObjectsStorage.lastKey();
     }
 }

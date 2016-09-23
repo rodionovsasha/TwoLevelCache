@@ -13,7 +13,7 @@ package cache.strategies;
 
 public class LRUStrategy<KeyType> extends CacheStrategy<KeyType> {
     @Override
-    public void putObject(KeyType key) {
-        treeMap.put(key, System.nanoTime());
+    public void putObject(KeyType objectKey) {
+        objectsStorage.put(objectKey, System.nanoTime());
     }
 }

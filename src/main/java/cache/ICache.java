@@ -5,11 +5,11 @@ package cache;
  */
 
 interface ICache<KeyType, ValueType> {
-    void putObjectIntoCache(KeyType key, ValueType val);
-    ValueType getObjectFromCache(KeyType key);
-    void removeObjectFromCache(KeyType key);
+    void putObjectIntoCache(KeyType objectKey, ValueType objectValue);
+    ValueType getObjectFromCache(KeyType objectKey);
+    void removeObjectFromCache(KeyType objectKey);
     int getCacheSize();
-    boolean isObjectPresent(KeyType key);
+    boolean isObjectPresent(KeyType objectKey);
     boolean hasEmptyPlace();
     void clearCache();
 }

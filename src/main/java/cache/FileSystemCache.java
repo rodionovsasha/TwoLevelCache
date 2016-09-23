@@ -13,18 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 class FileSystemCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCache.class);
     private static final String CACHE_DIR = "cache";
-    private final ConcurrentHashMap<KeyType, String> hashMap;
+    private final ConcurrentHashMap<KeyType, String> objectsStorage;
     private int capacity = CacheApp.MAX_CACHE_FILE_CAPACITY;
 
     FileSystemCache() {
         createDirectory();
-        this.hashMap = new ConcurrentHashMap<>(this.capacity);
+        this.objectsStorage = new ConcurrentHashMap<>(this.capacity);
     }
 
     FileSystemCache(int maxCapacity) {
         createDirectory();
         this.capacity = maxCapacity;
-        this.hashMap = new ConcurrentHashMap<>(this.capacity);
+        this.objectsStorage = new ConcurrentHashMap<>(this.capacity);
     }
 
     private void createDirectory() {
@@ -40,9 +40,9 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
     }
 
     @Override
-    public synchronized ValueType getObjectFromCache(KeyType key) {
-        if(isObjectPresent(key)) {
-            String fileName = hashMap.get(key);
+    public synchronized ValueType getObjectFromCache(KeyType objectKey) {
+        if(isObjectPresent(objectKey)) {
+            String fileName = objectsStorage.get(objectKey);
             ObjectInputStream objectInputStream = null;
             try {
                 FileInputStream fileInput = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
@@ -64,15 +64,15 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
     }
 
     @Override
-    public synchronized void putObjectIntoCache(KeyType key, ValueType val) {
+    public synchronized void putObjectIntoCache(KeyType objectKey, ValueType objectValue) {
         String fileName = UUID.randomUUID().toString();
         ObjectOutputStream objectOutputStream = null;
         try {            
             FileOutputStream fileStream = new FileOutputStream(new File(CACHE_DIR + "/" + fileName));
             objectOutputStream = new ObjectOutputStream(fileStream);
-            objectOutputStream.writeObject(val);
+            objectOutputStream.writeObject(objectValue);
             objectOutputStream.flush();
-            hashMap.put(key, fileName);
+            objectsStorage.put(objectKey, fileName);
         } catch (Exception e) {
             LOGGER.error("Can't write an object to a file " + fileName + ": " + e);
         } finally {
@@ -87,27 +87,27 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
     }
 
     @Override
-    public synchronized void removeObjectFromCache(KeyType key) {
-        if (isObjectPresent(key)) {
-            String fileName = hashMap.get(key);
+    public synchronized void removeObjectFromCache(KeyType objectKey) {
+        if (isObjectPresent(objectKey)) {
+            String fileName = objectsStorage.get(objectKey);
             File deletingFile = new File(CACHE_DIR + "/" + fileName);
             if(deletingFile.delete()) {// remove cache file
                 LOGGER.info("Cache file '" + fileName + "' has been deleted");
             } else {
                 LOGGER.info("Can't delete a file " + fileName);
             }
-            hashMap.remove(key);
+            objectsStorage.remove(objectKey);
         }
     }
 
     @Override
     public int getCacheSize() {
-        return hashMap.size();
+        return objectsStorage.size();
     }
 
     @Override
-    public boolean isObjectPresent(KeyType key) {
-        return hashMap.containsKey(key);
+    public boolean isObjectPresent(KeyType objectKey) {
+        return objectsStorage.containsKey(objectKey);
     }
 
     @Override
@@ -131,6 +131,6 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
                 }
             }
         }
-        hashMap.clear();
+        objectsStorage.clear();
     }
 }

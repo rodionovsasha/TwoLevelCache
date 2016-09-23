@@ -11,11 +11,11 @@ package cache.strategies;
 
 public class LFUStrategy<KeyType> extends CacheStrategy<KeyType> {
     @Override
-    public void putObject(KeyType key) {
+    public void putObject(KeyType objectKey) {
         long frequency = 1;
-        if (treeMap.containsKey(key)) {
-            frequency = treeMap.get(key) + 1;
+        if (objectsStorage.containsKey(objectKey)) {
+            frequency = objectsStorage.get(objectKey) + 1;
         }
-        treeMap.put(key, frequency);
+        objectsStorage.put(objectKey, frequency);
     }
 }

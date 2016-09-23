@@ -8,46 +8,46 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 class MemoryCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
-    private final ConcurrentHashMap<KeyType, ValueType> hashMap;
+    private final ConcurrentHashMap<KeyType, ValueType> objectsStorage;
     private int capacity = CacheApp.MAX_CACHE_MEMORY_CAPACITY;
 
     MemoryCache() {
-        this.hashMap = new ConcurrentHashMap<>(this.capacity); // ConcurrentHashMap is thread safe without synchronizing the whole map. Reads can happen very fast while write is done with a lock.
+        this.objectsStorage = new ConcurrentHashMap<>(this.capacity); // ConcurrentHashMap is thread safe without synchronizing the whole map. Reads can happen very fast while write is done with a lock.
     }
 
     MemoryCache(int maxCapacity) {
         this.capacity = maxCapacity;
-        this.hashMap = new ConcurrentHashMap<>(this.capacity);
+        this.objectsStorage = new ConcurrentHashMap<>(this.capacity);
     }
 
     @Override
-    public synchronized ValueType getObjectFromCache(KeyType key) {
-        if(isObjectPresent(key)) {
-            return hashMap.get(key);
+    public synchronized ValueType getObjectFromCache(KeyType objectKey) {
+        if(isObjectPresent(objectKey)) {
+            return objectsStorage.get(objectKey);
         }
         return null;
     }
 
     @Override
-    public synchronized void putObjectIntoCache(KeyType key, ValueType val) {
-        hashMap.put(key, val);
+    public synchronized void putObjectIntoCache(KeyType objectKey, ValueType objectValue) {
+        objectsStorage.put(objectKey, objectValue);
     }
 
     @Override
-    public synchronized void removeObjectFromCache(KeyType key) {
-        if (isObjectPresent(key)) {
-            hashMap.remove(key);
+    public synchronized void removeObjectFromCache(KeyType objectKey) {
+        if (isObjectPresent(objectKey)) {
+            objectsStorage.remove(objectKey);
         }
     }
 
     @Override
     public int getCacheSize() {
-        return hashMap.size();
+        return objectsStorage.size();
     }
 
     @Override
-    public boolean isObjectPresent(KeyType key) {
-        return hashMap.containsKey(key);
+    public boolean isObjectPresent(KeyType objectKey) {
+        return objectsStorage.containsKey(objectKey);
     }
 
     @Override
@@ -57,6 +57,6 @@ class MemoryCache<KeyType extends Serializable, ValueType extends Serializable> 
 
     @Override
     public void clearCache() {
-        hashMap.clear();
+        objectsStorage.clear();
     }
 }
