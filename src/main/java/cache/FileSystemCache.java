@@ -51,13 +51,7 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
             } catch (Exception e){
                 LOGGER.error("Can't read a file." + fileName + ": " + e);
             } finally {
-                if (objectInputStream != null) {
-                    try {
-                        objectInputStream.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Can't close inputStream: " + e);
-                    }
-                }
+                closeQuietly(objectInputStream);
             }
         }
         return null;
@@ -68,21 +62,14 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
         String fileName = UUID.randomUUID().toString();
         ObjectOutputStream objectOutputStream = null;
         try {            
-            FileOutputStream fileStream = new FileOutputStream(new File(CACHE_DIR + "/" + fileName));
-            objectOutputStream = new ObjectOutputStream(fileStream);
+            objectOutputStream = new ObjectOutputStream(new FileOutputStream(new File(CACHE_DIR + "/" + fileName)));
             objectOutputStream.writeObject(objectValue);
             objectOutputStream.flush();
             objectsStorage.put(objectKey, fileName);
         } catch (Exception e) {
             LOGGER.error("Can't write an object to a file " + fileName + ": " + e);
         } finally {
-            if (objectOutputStream != null){
-                try {
-                    objectOutputStream.close();
-                } catch (IOException e) {
-                    LOGGER.error("Can't close outputStream: " + e);
-                }
-            }
+            closeQuietly(objectOutputStream);
         }
     }
 
@@ -97,6 +84,16 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
                 LOGGER.info("Can't delete a file " + fileName);
             }
             objectsStorage.remove(objectKey);
+        }
+    }
+
+    private void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException ex) {
+                LOGGER.error("Can't close outputStream: " + ex);
+            }
         }
     }
 
