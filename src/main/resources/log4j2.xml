@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p [%t] %d{HH:mm:ss,SSS} %c{1.}.%M(%F:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+    <loggers>
+        <Logger name="org.apache.log4j.xml" level="all"/>
+        <root level="all">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </loggers>
+</Configuration>
