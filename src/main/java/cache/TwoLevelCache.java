@@ -16,7 +16,7 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     private static final Logger LOGGER = LoggerFactory.getLogger(TwoLevelCache.class);
     private final MemoryCache<K, V> firstLevelCache;
     private final FileSystemCache<K, V> secondLevelCache;
-    private CacheStrategy<K> strategy;
+    private final CacheStrategy<K> strategy;
 
     public TwoLevelCache(final MemoryCache<K, V> firstLevelCache, final FileSystemCache<K, V> secondLevelCache, final StrategyType strategyType) {
         this.firstLevelCache = firstLevelCache;
