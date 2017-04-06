@@ -18,17 +18,17 @@ class MemoryCache<K extends Serializable, V extends Serializable> implements Cac
     }
 
     @Override
-    public synchronized V getObjectFromCache(K key) {
+    public V getObjectFromCache(K key) {
         return objectsStorage.get(key);
     }
 
     @Override
-    public synchronized void putObjectIntoCache(K key, V value) {
+    public void putObjectIntoCache(K key, V value) {
         objectsStorage.put(key, value);
     }
 
     @Override
-    public synchronized void removeObjectFromCache(K key) {
+    public void removeObjectFromCache(K key) {
         objectsStorage.remove(key);
     }
 
