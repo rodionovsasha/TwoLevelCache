@@ -4,31 +4,31 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
-public abstract class CacheStrategy<KeyType> {
-    final Map<KeyType, Long> objectsStorage;
-    final TreeMap<KeyType, Long> sortedObjectsStorage; //TreeMap is sorted by keys.
+public abstract class CacheStrategy<K> {
+    final Map<K, Long> objectsStorage;
+    final TreeMap<K, Long> sortedObjectsStorage;
 
     CacheStrategy() {
         this.objectsStorage = new TreeMap<>();
         this.sortedObjectsStorage = new TreeMap<>(new ComparatorImpl<>(objectsStorage));
     }
 
-    public abstract void putObject(KeyType key);
+    public abstract void putObject(K key);
 
-    public void removeObject(KeyType key) {
+    public void removeObject(K key) {
         if(isObjectPresent(key)) {
             objectsStorage.remove(key);
         }
     }
 
-    public boolean isObjectPresent(KeyType key) {
+    public boolean isObjectPresent(K key) {
         return objectsStorage.containsKey(key);
     }
 
-    public KeyType getUsedKey() {
+    public K getReplacedKey() {
         sortedObjectsStorage.putAll(objectsStorage);
         return sortedObjectsStorage.firstKey();
     }

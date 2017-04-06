@@ -1,25 +1,21 @@
 package cache.strategies;
 
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
 /**
- * MRU (англ. Most Recently Used - Наиболее недавно использовавшийся) — вытесняется последний использованный буфер; в отличе от LRU, в первую очередь вытесняется последний использованный элемент.
- * Когда файл периодически сканируется по циклической схеме, MRU — наилучший алгоритм вытеснения.
- * Что для схем случайного доступа и циклического сканирования больших наборов данных (иногда называемых схемами циклического доступа)
- * алгоритмы кэширования MRU имеют больше попаданий по сравнению с LRU за счет их стремления к сохранению старых данных.
- * Алгоритмы MRU наиболее полезны в случаях, когда чем старше элемент, тем больше обращений к нему происходит.
+ * MRU Strategy - Most Recently Used
  */
 
-public class MRUStrategy<KeyType> extends CacheStrategy<KeyType> {
+public class MRUStrategy<K> extends CacheStrategy<K> {
     @Override
-    public void putObject(KeyType objectKey) {
-        objectsStorage.put(objectKey, System.nanoTime());
+    public void putObject(K key) {
+        objectsStorage.put(key, System.nanoTime());
     }
 
     @Override
-    public KeyType getUsedKey() {
+    public K getReplacedKey() {
         sortedObjectsStorage.putAll(objectsStorage);
         return sortedObjectsStorage.lastKey();
     }

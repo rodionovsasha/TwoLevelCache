@@ -2,99 +2,85 @@ package cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.String.format;
+
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
-class FileSystemCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType> {
+class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCache.class);
     private static final String CACHE_DIR = "cache";
-    private final ConcurrentHashMap<KeyType, String> objectsStorage;
-    private int capacity = CacheApp.MAX_CACHE_FILE_CAPACITY;
+    private final ConcurrentHashMap<K, String> objectsStorage;
+    private int capacity;
 
     FileSystemCache() {
         createDirectory();
-        this.objectsStorage = new ConcurrentHashMap<>(this.capacity);
+        this.objectsStorage = new ConcurrentHashMap<>();
     }
 
-    FileSystemCache(int maxCapacity) {
+    FileSystemCache(int capacity) {
         createDirectory();
-        this.capacity = maxCapacity;
-        this.objectsStorage = new ConcurrentHashMap<>(this.capacity);
+        this.capacity = capacity;
+        this.objectsStorage = new ConcurrentHashMap<>(capacity);
     }
 
     private void createDirectory() {
         File cacheDir = new File(CACHE_DIR);
-        if(!cacheDir.exists()) {
-            LOGGER.info("Creating directory: " + cacheDir + "...");
-            if(cacheDir.mkdir()) {
-                LOGGER.info(cacheDir + " has been created.");
+        if (!cacheDir.exists()) {
+            LOGGER.debug(format("Creating directory: %s...", cacheDir));
+            if (cacheDir.mkdir()) {
+                LOGGER.debug(format("%s has been created.", cacheDir));
             } else {
-                LOGGER.error("Can't create a directory " + cacheDir);
+                LOGGER.error(format("Can't create a directory %s", cacheDir));
             }
         }
     }
 
     @Override
-    public synchronized ValueType getObjectFromCache(KeyType objectKey) {
-        if(isObjectPresent(objectKey)) {
-            String fileName = objectsStorage.get(objectKey);
-            ObjectInputStream objectInputStream = null;
-            try {
-                FileInputStream fileInput = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
-                objectInputStream = new ObjectInputStream(fileInput);
-                return (ValueType) objectInputStream.readObject();
-            } catch (Exception e){
-                LOGGER.error("Can't read a file." + fileName + ": " + e);
-            } finally {
-                closeQuietly(objectInputStream);
+    public synchronized V getObjectFromCache(K key) {
+        if (isObjectPresent(key)) {
+            String fileName = objectsStorage.get(key);
+            try (FileInputStream fileInputStream = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
+                    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+                return (V)objectInputStream.readObject();
+            } catch (Exception e) {
+                LOGGER.error(format("Can't read a file. %s: %s", fileName, e));
             }
         }
+        LOGGER.debug(format("Object with key '%s' does not exist", key));
         return null;
     }
 
     @Override
-    public synchronized void putObjectIntoCache(KeyType objectKey, ValueType objectValue) {
+    public synchronized void putObjectIntoCache(K key, V value) {
         String fileName = UUID.randomUUID().toString();
-        ObjectOutputStream objectOutputStream = null;
-        try {            
-            objectOutputStream = new ObjectOutputStream(new FileOutputStream(new File(CACHE_DIR + "/" + fileName)));
-            objectOutputStream.writeObject(objectValue);
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(CACHE_DIR + "/" + fileName));
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(value);
             objectOutputStream.flush();
-            objectsStorage.put(objectKey, fileName);
+            objectsStorage.put(key, fileName);
         } catch (Exception e) {
             LOGGER.error("Can't write an object to a file " + fileName + ": " + e);
-        } finally {
-            closeQuietly(objectOutputStream);
         }
     }
 
     @Override
-    public synchronized void removeObjectFromCache(KeyType objectKey) {
-        if (isObjectPresent(objectKey)) {
-            String fileName = objectsStorage.get(objectKey);
-            File deletingFile = new File(CACHE_DIR + "/" + fileName);
-            if(deletingFile.delete()) {// remove cache file
-                LOGGER.info("Cache file '" + fileName + "' has been deleted");
-            } else {
-                LOGGER.info("Can't delete a file " + fileName);
-            }
-            objectsStorage.remove(objectKey);
+    public synchronized void removeObjectFromCache(K key) {
+        String fileName = objectsStorage.get(key);
+        File deletedFile = new File(CACHE_DIR + "/" + fileName);
+        if (deletedFile.delete()) {
+            LOGGER.debug(format("Cache file '%s' has been deleted", fileName));
+        } else {
+            LOGGER.debug(format("Can't delete a file %s", fileName));
         }
-    }
-
-    private void closeQuietly(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ex) {
-                LOGGER.error("Can't close outputStream: " + ex);
-            }
-        }
+        objectsStorage.remove(key);
     }
 
     @Override
@@ -103,28 +89,28 @@ class FileSystemCache<KeyType extends Serializable, ValueType extends Serializab
     }
 
     @Override
-    public boolean isObjectPresent(KeyType objectKey) {
-        return objectsStorage.containsKey(objectKey);
+    public boolean isObjectPresent(K key) {
+        return objectsStorage.containsKey(key);
     }
 
     @Override
     public boolean hasEmptyPlace() {
-        return (getCacheSize() < this.capacity);
+        return getCacheSize() < this.capacity;
     }
 
     @Override
     public void clearCache() {
-        File cacheDir = new File(CACHE_DIR);// delete all files in directory (but not directory)
+        File cacheDir = new File(CACHE_DIR);// delete all files in directory (but not a directory)
         if (cacheDir.exists()) {
             File[] files = cacheDir.listFiles();
             if (files == null) {
                 return;
             }
-            for(File file : files) {// remove cache files
-                if(file.delete()) {
-                    LOGGER.info("Cache file '" + file + "' has been deleted");
+            for (File file : files) {// remove cache files
+                if (file.delete()) {
+                    LOGGER.debug(format("Cache file '%s' has been deleted", file));
                 } else {
-                    LOGGER.error("Can't delete a file " + file);
+                    LOGGER.error(format("Can't delete a file %s", file));
                 }
             }
         }

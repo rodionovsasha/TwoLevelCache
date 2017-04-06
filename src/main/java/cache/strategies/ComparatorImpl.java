@@ -4,24 +4,26 @@ import java.util.Comparator;
 import java.util.Map;
 
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
-class ComparatorImpl<KeyType> implements Comparator<KeyType> {
-    private final Map<KeyType, Long> comparatorMap;
+class ComparatorImpl<K> implements Comparator<K> {
+    private final Map<K, Long> comparatorMap;
 
-    ComparatorImpl(Map<KeyType, Long> comparatorMap) {
+    ComparatorImpl(Map<K, Long> comparatorMap) {
         this.comparatorMap = comparatorMap;
     }
 
     @Override
-    public int compare(KeyType key1, KeyType key2) {
-        if(comparatorMap.get(key1) > comparatorMap.get(key2)) {
-            return 1;   // key1 must be later than key2
-        } else if(comparatorMap.get(key1) < comparatorMap.get(key2)) {
-            return -1;  // key1 must be earlier than key2
-        } else {
-            return 0;   // key1 and key2 are equals
+    public int compare(K key1, K key2) {
+        Long key1Long = comparatorMap.get(key1);
+        Long key2Long = comparatorMap.get(key2);
+        if(key1Long > key2Long) {
+            return 1;  //key1 must be later than key2
         }
+        if(key1Long < key2Long) {
+            return -1; //key1 must be earlier than key2
+        }
+        return 0;      //key1 and key2 are equals
     }
 }

@@ -3,11 +3,12 @@ package cache;
 import org.junit.After;
 import org.junit.Test;
 
+import static cache.strategies.StrategyType.MRU;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
 public class MRUCacheTest {
@@ -20,7 +21,7 @@ public class MRUCacheTest {
 
     @Test
     public void shouldMoveObjectFromCacheTest() {
-        twoLevelCache = new TwoLevelCache<>(2, 2, CacheApp.StrategyType.MRU);
+        twoLevelCache = new TwoLevelCache<>(2, 2, MRU);
 
         // i=3 - Most Recently Used - will be removed
         for (int i = 0; i < 4; i++) {
@@ -34,7 +35,7 @@ public class MRUCacheTest {
         assertTrue(twoLevelCache.isObjectPresent(0));
         assertTrue(twoLevelCache.isObjectPresent(1));
         assertTrue(twoLevelCache.isObjectPresent(2));
-        assertFalse(twoLevelCache.isObjectPresent(3));
+        assertFalse(twoLevelCache.isObjectPresent(3)); //Most Recently Used - has been removed
         assertTrue(twoLevelCache.isObjectPresent(4));
     }
 }

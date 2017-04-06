@@ -1,108 +1,132 @@
 package cache;
 
-import cache.strategies.CacheStrategy;
-import cache.strategies.LFUStrategy;
-import cache.strategies.LRUStrategy;
-import cache.strategies.MRUStrategy;
+import cache.strategies.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 
+import static java.lang.String.format;
+
 /*
- * Copyright (©) 2015. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Alexander
  */
 
-public class TwoLevelCache<KeyType extends Serializable, ValueType extends Serializable> implements ICache<KeyType, ValueType>{
-    private final ICache<KeyType, ValueType> firstLevelCache;
-    private final ICache<KeyType, ValueType> secondLevelCache;
-    private CacheStrategy<KeyType> strategy = getStrategy(CacheApp.StrategyType.LFU); //default strategy is LFU 
+public class TwoLevelCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TwoLevelCache.class);
+    private final MemoryCache<K, V> firstLevelCache;
+    private final FileSystemCache<K, V> secondLevelCache;
+    private CacheStrategy<K> strategy;
 
-    public TwoLevelCache(ICache<KeyType, ValueType> memoryCache, ICache<KeyType, ValueType> fileSystemCache, CacheApp.StrategyType strategyType) {
+    public TwoLevelCache(final MemoryCache<K, V> firstLevelCache, final FileSystemCache<K, V> secondLevelCache, final StrategyType strategyType) {
+        this.firstLevelCache = firstLevelCache;
+        this.secondLevelCache = secondLevelCache;
         this.strategy = getStrategy(strategyType);
-        this.firstLevelCache = memoryCache;
-        this.secondLevelCache = fileSystemCache;
     }
 
-    public TwoLevelCache(int memoryCapacity, int fileCapacity, CacheApp.StrategyType strategyType) {
-        this.strategy = getStrategy(strategyType);
+    public TwoLevelCache(final int memoryCapacity, final int fileCapacity, final StrategyType strategyType) {
         this.firstLevelCache = new MemoryCache<>(memoryCapacity);
         this.secondLevelCache = new FileSystemCache<>(fileCapacity);
+        this.strategy = getStrategy(strategyType);
     }
 
-    public TwoLevelCache(int memoryCapacity, int fileCapacity) {
+    public TwoLevelCache(final int memoryCapacity, final int fileCapacity) {
         this.firstLevelCache = new MemoryCache<>(memoryCapacity);
         this.secondLevelCache = new FileSystemCache<>(fileCapacity);
+        this.strategy = getStrategy(StrategyType.LFU);
     }
-   
-    private CacheStrategy<KeyType> getStrategy(CacheApp.StrategyType strategyType) {
+
+    public MemoryCache<K, V> getFirstLevelCache() {
+        return firstLevelCache;
+    }
+
+    public FileSystemCache<K, V> getSecondLevelCache() {
+        return secondLevelCache;
+    }
+
+    public CacheStrategy<K> getStrategy() {
+        return strategy;
+    }
+
+    private CacheStrategy<K> getStrategy(StrategyType strategyType) {
         switch (strategyType) {
-            case LFU:
-                return new LFUStrategy<>();
-            case LRU:
-                return new LRUStrategy<>();
-            case MRU:
-                return new MRUStrategy<>();
-            default:
-                return new LFUStrategy<>();
+        case LRU:
+            return new LRUStrategy<>();
+        case MRU:
+            return new MRUStrategy<>();
+        case LFU:
+        default:
+            return new LFUStrategy<>();
         }
     }
 
     @Override
-    public synchronized void putObjectIntoCache(KeyType objectKey, ValueType objectValue) {
-        if (firstLevelCache.isObjectPresent(objectKey) || firstLevelCache.hasEmptyPlace()) {
-            firstLevelCache.putObjectIntoCache(objectKey, objectValue);
-        } else if (secondLevelCache.isObjectPresent(objectKey) || secondLevelCache.hasEmptyPlace()) {
-            secondLevelCache.putObjectIntoCache(objectKey, objectValue);
+    public synchronized void putObjectIntoCache(K newKey, V newValue) {
+        if (firstLevelCache.isObjectPresent(newKey) || firstLevelCache.hasEmptyPlace()) {
+            LOGGER.debug(format("Put object with key %s to the 1st level", newKey));
+            firstLevelCache.putObjectIntoCache(newKey, newValue);
+            if (secondLevelCache.isObjectPresent(newKey)) {
+                secondLevelCache.removeObjectFromCache(newKey);
+            }
+        } else if (secondLevelCache.isObjectPresent(newKey) || secondLevelCache.hasEmptyPlace()) {
+            LOGGER.debug(format("Put object with key %s to the 2nd level", newKey));
+            secondLevelCache.putObjectIntoCache(newKey, newValue);
         } else {
-            // Here we have full cache and have to replace object according to cache strategy.
-            replaceUsedKey(objectKey, objectValue);
+            replaceObject(newKey, newValue); // Here we have full cache and have to replace some object with new one according to cache strategy.
         }
 
-        if (!strategy.isObjectPresent(objectKey)) {
-            strategy.putObject(objectKey);
+        if (!strategy.isObjectPresent(newKey)) {
+            LOGGER.debug(format("Put object with key %s to strategy", newKey));
+            strategy.putObject(newKey);
         }
     }
 
-    private void replaceUsedKey(KeyType key, ValueType value) {
-        KeyType usedKey = strategy.getUsedKey();
-        if (firstLevelCache.isObjectPresent(usedKey)) {
-            firstLevelCache.removeObjectFromCache(usedKey);
+    private void replaceObject(K key, V value) {
+        K replacedKey = strategy.getReplacedKey();
+        if (firstLevelCache.isObjectPresent(replacedKey)) {
+            LOGGER.debug(format("Replace object with key %s from 1st level", replacedKey));
+            firstLevelCache.removeObjectFromCache(replacedKey);
             firstLevelCache.putObjectIntoCache(key, value);
-        } else {
-            secondLevelCache.removeObjectFromCache(usedKey);
+        } else if (secondLevelCache.isObjectPresent(replacedKey)) {
+            LOGGER.debug(format("Replace object with key %s from 2nd level", replacedKey));
+            secondLevelCache.removeObjectFromCache(replacedKey);
             secondLevelCache.putObjectIntoCache(key, value);
         }
     }
 
     @Override
-    public synchronized ValueType getObjectFromCache(KeyType objectKey) {
-        if (firstLevelCache.isObjectPresent(objectKey)) {
-            strategy.putObject(objectKey);
-            return firstLevelCache.getObjectFromCache(objectKey);
-        } else if (secondLevelCache.isObjectPresent(objectKey)) {
-            strategy.putObject(objectKey);
-            return secondLevelCache.getObjectFromCache(objectKey);
+    public synchronized V getObjectFromCache(K key) {
+        if (firstLevelCache.isObjectPresent(key)) {
+            strategy.putObject(key);
+            return firstLevelCache.getObjectFromCache(key);
+        } else if (secondLevelCache.isObjectPresent(key)) {
+            strategy.putObject(key);
+            return secondLevelCache.getObjectFromCache(key);
         }
         return null;
     }
 
     @Override
-    public synchronized void removeObjectFromCache(KeyType objectKey) {
-        if (firstLevelCache.isObjectPresent(objectKey)) {
-            firstLevelCache.removeObjectFromCache(objectKey);
+    public synchronized void removeObjectFromCache(K key) {
+        if (firstLevelCache.isObjectPresent(key)) {
+            LOGGER.debug(format("Remove object with key %s from 1st level", key));
+            firstLevelCache.removeObjectFromCache(key);
         }
-        if (secondLevelCache.isObjectPresent(objectKey)) {
-            secondLevelCache.removeObjectFromCache(objectKey);
+        if (secondLevelCache.isObjectPresent(key)) {
+            LOGGER.debug(format("Remove object with key %s from 2nd level", key));
+            secondLevelCache.removeObjectFromCache(key);
         }
-        strategy.removeObject(objectKey);
+        strategy.removeObject(key);
     }
 
     @Override
     public int getCacheSize() {
-        return (firstLevelCache.getCacheSize() + secondLevelCache.getCacheSize());
+        return firstLevelCache.getCacheSize() + secondLevelCache.getCacheSize();
     }
 
     @Override
-    public boolean isObjectPresent(KeyType objectKey) {
-        return (firstLevelCache.isObjectPresent(objectKey) || secondLevelCache.isObjectPresent(objectKey));
+    public boolean isObjectPresent(K key) {
+        return firstLevelCache.isObjectPresent(key) || secondLevelCache.isObjectPresent(key);
     }
 
     @Override
@@ -114,18 +138,6 @@ public class TwoLevelCache<KeyType extends Serializable, ValueType extends Seria
 
     @Override
     public synchronized boolean hasEmptyPlace() {
-        return (firstLevelCache.hasEmptyPlace() || secondLevelCache.hasEmptyPlace());
-    }
-
-    ICache<KeyType, ValueType> getFirstLevelCache() {
-        return firstLevelCache;
-    }
-
-    ICache<KeyType, ValueType> getSecondLevelCache() {
-        return secondLevelCache;
-    }
-
-    CacheStrategy<KeyType> getStrategy() {
-        return strategy;
+        return firstLevelCache.hasEmptyPlace() || secondLevelCache.hasEmptyPlace();
     }
 }
