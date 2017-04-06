@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
+    <Properties>
+        <Property name="maven.logging.root.level">ALL</Property>
+    </Properties>
     <Appenders>
-        <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-5p [%t] %d{HH:mm:ss,SSS} %c{1.}.%M(%F:%L) - %m%n"/>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{[%-5level]}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=black, DEBUG=green bold, TRACE=blue} [%t] %style{%c{1.}}{cyan} - %msg%n%throwable"/>
         </Console>
     </Appenders>
     <loggers>
-        <Logger name="org.apache.log4j.xml" level="all"/>
-        <root level="all">
-            <appender-ref ref="STDOUT"/>
+        <root level="${sys:maven.logging.root.level}">
+            <appender-ref ref="console"/>
         </root>
     </loggers>
 </Configuration>
