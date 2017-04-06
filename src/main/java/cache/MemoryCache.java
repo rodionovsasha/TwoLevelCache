@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class MemoryCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private final Map<K, V> objectsStorage;
-    private int capacity;
+    private final int capacity;
 
     MemoryCache(int capacity) {
         this.capacity = capacity;
