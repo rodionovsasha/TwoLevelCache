@@ -11,6 +11,6 @@ package cache.strategies;
 public class LRUStrategy<K> extends CacheStrategy<K> {
     @Override
     public void putObject(K key) {
-        objectsStorage.put(key, System.nanoTime());
+        getObjectsStorage().put(key, System.nanoTime());
     }
 }

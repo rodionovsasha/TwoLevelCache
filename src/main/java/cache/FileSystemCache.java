@@ -49,7 +49,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
             try (FileInputStream fileInputStream = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
                     ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
                 return (V)objectInputStream.readObject();
-            } catch (Exception e) {
+            } catch (ClassNotFoundException | IOException e) {
                 LOGGER.error(format("Can't read a file. %s: %s", fileName, e));
             }
         }
@@ -66,7 +66,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
             objectOutputStream.writeObject(value);
             objectOutputStream.flush();
             objectsStorage.put(key, fileName);
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("Can't write an object to a file " + fileName + ": " + e);
         }
     }
@@ -106,7 +106,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
             if (files == null) {
                 return;
             }
-            for (File file : files) {// remove cache files
+            for (File file : files) { // remove cache files
                 if (file.delete()) {
                     LOGGER.debug(format("Cache file '%s' has been deleted", file));
                 } else {

@@ -1,5 +1,6 @@
 package cache;
 
+import cache.strategies.StrategyType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -201,5 +202,38 @@ public class TwoLevelCacheTest {
         assertEquals(0, twoLevelCache.getCacheSize());
         assertFalse(twoLevelCache.getStrategy().isObjectPresent(0));
         assertFalse(twoLevelCache.getStrategy().isObjectPresent(1));
+    }
+
+    @Test
+    public void shouldUseLRUStrategyTest() {
+        twoLevelCache = new TwoLevelCache<>(1, 1, StrategyType.LRU);
+        twoLevelCache.putObjectIntoCache(0, VALUE1);
+        assertEquals(VALUE1, twoLevelCache.getObjectFromCache(0));
+        assertEquals(VALUE1, twoLevelCache.getFirstLevelCache().getObjectFromCache(0));
+        assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(0));
+    }
+
+    @Test
+    public void shouldUseMRUStrategyTest() {
+        twoLevelCache = new TwoLevelCache<>(1, 1, StrategyType.MRU);
+        twoLevelCache.putObjectIntoCache(0, VALUE1);
+        assertEquals(VALUE1, twoLevelCache.getObjectFromCache(0));
+        assertEquals(VALUE1, twoLevelCache.getFirstLevelCache().getObjectFromCache(0));
+        assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(0));
+    }
+
+    @Test
+    public void shouldReplaceObjectFromSecondLevelTest() {
+        for (int i = 0; i < 2; i++) {
+            twoLevelCache.putObjectIntoCache(i, "String " + i);
+        }
+        assertFalse(twoLevelCache.hasEmptyPlace());
+
+        twoLevelCache.putObjectIntoCache(5, VALUE3);
+
+        /*assertTrue(twoLevelCache.getObjectFromCache(3).equals(VALUE3));
+        assertTrue(twoLevelCache.getStrategy().isObjectPresent(3));
+        assertTrue(twoLevelCache.getFirstLevelCache().isObjectPresent(3));
+        assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(3));*/
     }
 }

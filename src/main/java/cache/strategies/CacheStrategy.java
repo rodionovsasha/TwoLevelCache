@@ -8,8 +8,8 @@ import java.util.TreeMap;
  */
 
 public abstract class CacheStrategy<K> {
-    final Map<K, Long> objectsStorage;
-    final TreeMap<K, Long> sortedObjectsStorage;
+    private final Map<K, Long> objectsStorage;
+    private final TreeMap<K, Long> sortedObjectsStorage;
 
     CacheStrategy() {
         this.objectsStorage = new TreeMap<>();
@@ -19,7 +19,7 @@ public abstract class CacheStrategy<K> {
     public abstract void putObject(K key);
 
     public void removeObject(K key) {
-        if(isObjectPresent(key)) {
+        if (isObjectPresent(key)) {
             objectsStorage.remove(key);
         }
     }
@@ -35,5 +35,13 @@ public abstract class CacheStrategy<K> {
 
     public void clear() {
         objectsStorage.clear();
+    }
+
+    public Map<K, Long> getObjectsStorage() {
+        return objectsStorage;
+    }
+
+    public TreeMap<K, Long> getSortedObjectsStorage() {
+        return sortedObjectsStorage;
     }
 }

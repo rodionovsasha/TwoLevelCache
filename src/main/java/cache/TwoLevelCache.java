@@ -18,7 +18,8 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     private final FileSystemCache<K, V> secondLevelCache;
     private final CacheStrategy<K> strategy;
 
-    public TwoLevelCache(final MemoryCache<K, V> firstLevelCache, final FileSystemCache<K, V> secondLevelCache, final StrategyType strategyType) {
+    public TwoLevelCache(final MemoryCache<K, V> firstLevelCache, final FileSystemCache<K, V> secondLevelCache,
+            final StrategyType strategyType) {
         this.firstLevelCache = firstLevelCache;
         this.secondLevelCache = secondLevelCache;
         this.strategy = getStrategy(strategyType);
@@ -72,7 +73,8 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
             LOGGER.debug(format("Put object with key %s to the 2nd level", newKey));
             secondLevelCache.putObjectIntoCache(newKey, newValue);
         } else {
-            replaceObject(newKey, newValue); // Here we have full cache and have to replace some object with new one according to cache strategy.
+            // Here we have full cache and have to replace some object with new one according to cache strategy.
+            replaceObject(newKey, newValue);
         }
 
         if (!strategy.isObjectPresent(newKey)) {

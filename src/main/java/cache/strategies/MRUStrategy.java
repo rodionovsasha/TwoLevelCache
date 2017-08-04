@@ -11,12 +11,12 @@ package cache.strategies;
 public class MRUStrategy<K> extends CacheStrategy<K> {
     @Override
     public void putObject(K key) {
-        objectsStorage.put(key, System.nanoTime());
+        getObjectsStorage().put(key, System.nanoTime());
     }
 
     @Override
     public K getReplacedKey() {
-        sortedObjectsStorage.putAll(objectsStorage);
-        return sortedObjectsStorage.lastKey();
+        getSortedObjectsStorage().putAll(getObjectsStorage());
+        return getSortedObjectsStorage().lastKey();
     }
 }
