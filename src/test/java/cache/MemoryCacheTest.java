@@ -44,6 +44,16 @@ public class MemoryCacheTest {
     }
 
     @Test
+    public void shouldNotRemoveObjectFromCacheIfNotExistsTest() {
+        memoryCache.putObjectIntoCache(0, VALUE1);
+        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
+        assertEquals(1, memoryCache.getCacheSize());
+
+        memoryCache.removeObjectFromCache(5);
+        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
+    }
+
+    @Test
     public void shouldGetCacheSizeTest() {
         memoryCache.putObjectIntoCache(0, VALUE1);
         assertEquals(1, memoryCache.getCacheSize());

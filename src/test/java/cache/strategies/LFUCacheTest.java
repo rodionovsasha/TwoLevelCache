@@ -1,5 +1,6 @@
-package cache;
+package cache.strategies;
 
+import cache.TwoLevelCache;
 import org.junit.After;
 import org.junit.Test;
 
@@ -8,7 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2017. Rodionov Alexander
  */
 
 public class LFUCacheTest {

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -102,11 +103,12 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     public void clearCache() {
         File cacheDir = new File(CACHE_DIR);// delete all files in directory (but not a directory)
         if (cacheDir.exists()) {
-            File[] files = cacheDir.listFiles();
-            if (files == null) {
+            Optional<File[]> files = Optional.ofNullable(cacheDir.listFiles());
+
+            if (!files.isPresent()) {
                 return;
             }
-            for (File file : files) { // remove cache files
+            for (File file : files.get()) { // remove cache files
                 if (file.delete()) {
                     LOGGER.debug(format("Cache file '%s' has been deleted", file));
                 } else {

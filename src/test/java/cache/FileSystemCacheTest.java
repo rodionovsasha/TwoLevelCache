@@ -44,6 +44,16 @@ public class FileSystemCacheTest {
     }
 
     @Test
+    public void shouldNotRemoveObjectFromCacheIfNotExistsTest() {
+        fileSystemCache.putObjectIntoCache(0, VALUE1);
+        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
+        assertEquals(1, fileSystemCache.getCacheSize());
+
+        fileSystemCache.removeObjectFromCache(5);
+        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
+    }
+
+    @Test
     public void shouldGetCacheSizeTest() {
         fileSystemCache.putObjectIntoCache(0, VALUE1);
         assertEquals(1, fileSystemCache.getCacheSize());

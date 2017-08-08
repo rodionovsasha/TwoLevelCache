@@ -18,13 +18,6 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     private final FileSystemCache<K, V> secondLevelCache;
     private final CacheStrategy<K> strategy;
 
-    public TwoLevelCache(final MemoryCache<K, V> firstLevelCache, final FileSystemCache<K, V> secondLevelCache,
-            final StrategyType strategyType) {
-        this.firstLevelCache = firstLevelCache;
-        this.secondLevelCache = secondLevelCache;
-        this.strategy = getStrategy(strategyType);
-    }
-
     public TwoLevelCache(final int memoryCapacity, final int fileCapacity, final StrategyType strategyType) {
         this.firstLevelCache = new MemoryCache<>(memoryCapacity);
         this.secondLevelCache = new FileSystemCache<>(fileCapacity);

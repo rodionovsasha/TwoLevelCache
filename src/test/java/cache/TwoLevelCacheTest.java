@@ -221,19 +221,4 @@ public class TwoLevelCacheTest {
         assertEquals(VALUE1, twoLevelCache.getFirstLevelCache().getObjectFromCache(0));
         assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(0));
     }
-
-    @Test
-    public void shouldReplaceObjectFromSecondLevelTest() {
-        for (int i = 0; i < 2; i++) {
-            twoLevelCache.putObjectIntoCache(i, "String " + i);
-        }
-        assertFalse(twoLevelCache.hasEmptyPlace());
-
-        twoLevelCache.putObjectIntoCache(5, VALUE3);
-
-        /*assertTrue(twoLevelCache.getObjectFromCache(3).equals(VALUE3));
-        assertTrue(twoLevelCache.getStrategy().isObjectPresent(3));
-        assertTrue(twoLevelCache.getFirstLevelCache().isObjectPresent(3));
-        assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(3));*/
-    }
 }
