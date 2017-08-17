@@ -1,9 +1,12 @@
 package com.github.rodionovsasha.cache;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.Optional;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,8 +16,7 @@ import static java.lang.String.format;
  * Copyright (©) 2014. Rodionov Alexander
  */
 
-@Slf4j
-class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+@Slf4j class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private static final String CACHE_DIR = "cache";
     private final ConcurrentHashMap<K, String> objectsStorage;
     private int capacity;
@@ -98,23 +100,19 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
         return getCacheSize() < this.capacity;
     }
 
+    @SneakyThrows
     @Override
     public void clearCache() {
-        File cacheDir = new File(CACHE_DIR);// delete all files in directory (but not a directory)
-        if (cacheDir.exists()) {
-            Optional<File[]> files = Optional.ofNullable(cacheDir.listFiles());
-
-            if (!files.isPresent()) {
-                return;
-            }
-            for (File file : files.get()) { // remove cache files
-                if (file.delete()) {
-                    log.debug(format("Cache file '%s' has been deleted", file));
-                } else {
-                    log.error(format("Can't delete a file %s", file));
-                }
-            }
-        }
+        Files.walk(Paths.get(CACHE_DIR))
+                .filter(Files::isRegularFile)
+                .map(Path::toFile)
+                .forEach(file -> {
+                    if (file.delete()) {
+                        log.debug(format("Cache file '%s' has been deleted", file));
+                    } else {
+                        log.error(format("Can't delete a file %s", file));
+                    }
+                });
         objectsStorage.clear();
     }
 }
