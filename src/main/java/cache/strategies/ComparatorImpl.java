@@ -1,5 +1,7 @@
 package cache.strategies;
 
+import lombok.AllArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
@@ -8,14 +10,11 @@ import java.util.Map;
  * Copyright (©) 2014. Rodionov Alexander
  */
 
+@AllArgsConstructor
 class ComparatorImpl<K> implements Comparator<K>, Serializable {
-    private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1L;
 
     private final Map<K, Long> comparatorMap;
-
-    ComparatorImpl(Map<K, Long> comparatorMap) {
-        this.comparatorMap = comparatorMap;
-    }
 
     @Override
     public int compare(K key1, K key2) {

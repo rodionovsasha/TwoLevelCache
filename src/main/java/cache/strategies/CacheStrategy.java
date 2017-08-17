@@ -1,5 +1,7 @@
 package cache.strategies;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -7,6 +9,7 @@ import java.util.TreeMap;
  * Copyright (©) 2014. Rodionov Alexander
  */
 
+@Getter
 public abstract class CacheStrategy<K> {
     private final Map<K, Long> objectsStorage;
     private final TreeMap<K, Long> sortedObjectsStorage;
@@ -35,13 +38,5 @@ public abstract class CacheStrategy<K> {
 
     public void clear() {
         objectsStorage.clear();
-    }
-
-    public Map<K, Long> getObjectsStorage() {
-        return objectsStorage;
-    }
-
-    public TreeMap<K, Long> getSortedObjectsStorage() {
-        return sortedObjectsStorage;
     }
 }
