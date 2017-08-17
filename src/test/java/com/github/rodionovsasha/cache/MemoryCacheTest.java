@@ -4,6 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.stream.IntStream;
+
 import static org.junit.Assert.*;
 
 /*
@@ -74,9 +76,8 @@ public class MemoryCacheTest {
     public void isEmptyPlaceTest() {
         memoryCache = new MemoryCache<>(5);
 
-        for (int i = 0; i < 4; i++) {
-            memoryCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 4).forEach(i -> memoryCache.putObjectIntoCache(i, "String " + i));
+
         assertTrue(memoryCache.hasEmptyPlace());
         memoryCache.putObjectIntoCache(5, "String");
         assertFalse(memoryCache.hasEmptyPlace());
@@ -84,9 +85,8 @@ public class MemoryCacheTest {
 
     @Test
     public void shouldClearCacheTest() {
-        for (int i = 0; i < 3; i++) {
-            memoryCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 3).forEach(i -> memoryCache.putObjectIntoCache(i, "String " + i));
+
         assertEquals(3, memoryCache.getCacheSize());
         memoryCache.clearCache();
         assertEquals(0, memoryCache.getCacheSize());

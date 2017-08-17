@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.stream.IntStream;
+
 import static org.junit.Assert.*;
 
 /*
@@ -112,9 +114,8 @@ public class TwoLevelCacheTest {
 
     @Test
     public void shouldPutObjectIntoCacheWhenSecondLevelHasEmptyPlaceTest() {
-        for (int i = 0; i < 1; i++) {
-            twoLevelCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 1).forEach(i -> twoLevelCache.putObjectIntoCache(i, "String " + i));
+
         assertFalse(twoLevelCache.getFirstLevelCache().hasEmptyPlace());
         assertTrue(twoLevelCache.getSecondLevelCache().hasEmptyPlace());
 
@@ -126,9 +127,8 @@ public class TwoLevelCacheTest {
 
     @Test
     public void shouldPutObjectIntoCacheWhenObjectExistsInSecondLevelTest() {
-        for (int i = 0; i < 1; i++) {
-            twoLevelCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 1).forEach(i -> twoLevelCache.putObjectIntoCache(i, "String " + i));
+
         assertFalse(twoLevelCache.getFirstLevelCache().hasEmptyPlace());
 
         twoLevelCache.putObjectIntoCache(2, VALUE2);
@@ -147,9 +147,8 @@ public class TwoLevelCacheTest {
 
     @Test
     public void shouldPutObjectIntoCacheWhenObjectShouldBeReplacedTest() {
-        for (int i = 0; i < 2; i++) {
-            twoLevelCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 2).forEach(i -> twoLevelCache.putObjectIntoCache(i, "String " + i));
+
         assertFalse(twoLevelCache.hasEmptyPlace());
         assertFalse(twoLevelCache.getStrategy().isObjectPresent(3));
 

@@ -4,6 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.stream.IntStream;
+
 import static org.junit.Assert.*;
 
 /*
@@ -74,9 +76,7 @@ public class FileSystemCacheTest {
     public void isEmptyPlaceTest() {
         fileSystemCache = new FileSystemCache<>(5);
 
-        for (int i = 0; i < 4; i++) {
-            fileSystemCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 4).forEach(i -> fileSystemCache.putObjectIntoCache(i, "String " + i));
         assertTrue(fileSystemCache.hasEmptyPlace());
         fileSystemCache.putObjectIntoCache(5, "String");
         assertFalse(fileSystemCache.hasEmptyPlace());
@@ -84,9 +84,8 @@ public class FileSystemCacheTest {
 
     @Test
     public void shouldClearCacheTest() {
-        for (int i = 0; i < 3; i++) {
-            fileSystemCache.putObjectIntoCache(i, "String " + i);
-        }
+        IntStream.range(0, 3).forEach(i -> fileSystemCache.putObjectIntoCache(i, "String " + i));
+
         assertEquals(3, fileSystemCache.getCacheSize());
         fileSystemCache.clearCache();
         assertEquals(0, fileSystemCache.getCacheSize());
