@@ -46,7 +46,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     public synchronized V getObjectFromCache(K key) {
         if (isObjectPresent(key)) {
             String fileName = objectsStorage.get(key);
-            try (FileInputStream fileInputStream = new FileInputStream(new File(CACHE_DIR + "/" + fileName));
+            try (FileInputStream fileInputStream = new FileInputStream(new File(CACHE_DIR + File.separator + fileName));
                     ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
                 return (V)objectInputStream.readObject();
             } catch (ClassNotFoundException | IOException e) {
@@ -61,7 +61,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     public synchronized void putObjectIntoCache(K key, V value) {
         String fileName = UUID.randomUUID().toString();
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(CACHE_DIR + "/" + fileName));
+        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(CACHE_DIR + File.separator + fileName));
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(value);
             objectOutputStream.flush();
@@ -74,7 +74,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     @Override
     public synchronized void removeObjectFromCache(K key) {
         String fileName = objectsStorage.get(key);
-        File deletedFile = new File(CACHE_DIR + "/" + fileName);
+        File deletedFile = new File(CACHE_DIR + File.separator + fileName);
         if (deletedFile.delete()) {
             log.debug(format("Cache file '%s' has been deleted", fileName));
         } else {
