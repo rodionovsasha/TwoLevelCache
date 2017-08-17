@@ -1,4 +1,4 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package cache.strategies;
+package com.github.rodionovsasha.cache.strategies;
 
 import lombok.Getter;
 

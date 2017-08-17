@@ -1,4 +1,4 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
 /*
  * Copyright (©) 2014. Rodionov Alexander

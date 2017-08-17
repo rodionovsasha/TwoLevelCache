@@ -1,6 +1,6 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
-import cache.strategies.*;
+import com.github.rodionovsasha.cache.strategies.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
 import java.io.Serializable;
 import java.util.Map;

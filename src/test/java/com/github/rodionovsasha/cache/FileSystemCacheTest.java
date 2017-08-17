@@ -1,4 +1,4 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
 import org.junit.After;
 import org.junit.Before;

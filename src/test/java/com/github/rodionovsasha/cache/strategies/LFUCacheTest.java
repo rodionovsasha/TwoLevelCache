@@ -1,10 +1,10 @@
-package cache.strategies;
+package com.github.rodionovsasha.cache.strategies;
 
-import cache.TwoLevelCache;
+import com.github.rodionovsasha.cache.TwoLevelCache;
 import org.junit.After;
 import org.junit.Test;
 
-import static cache.strategies.StrategyType.LFU;
+import static com.github.rodionovsasha.cache.strategies.StrategyType.LFU;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

@@ -1,6 +1,6 @@
-package cache;
+package com.github.rodionovsasha.cache;
 
-import cache.strategies.StrategyType;
+import com.github.rodionovsasha.cache.strategies.StrategyType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
