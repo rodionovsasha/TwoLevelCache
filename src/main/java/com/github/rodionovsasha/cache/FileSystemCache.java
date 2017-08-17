@@ -16,7 +16,8 @@ import static java.lang.String.format;
  * Copyright (©) 2014. Rodionov Alexander
  */
 
-@Slf4j class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+@Slf4j
+class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private static final String CACHE_DIR = "cache";
     private final ConcurrentHashMap<K, String> objectsStorage;
     private int capacity;
