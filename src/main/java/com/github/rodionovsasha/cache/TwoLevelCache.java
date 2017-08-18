@@ -3,6 +3,7 @@ package com.github.rodionovsasha.cache;
 import com.github.rodionovsasha.cache.strategies.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.Serializable;
 
@@ -66,7 +67,7 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     }
 
     private void replaceObject(K key, V value) {
-        K replacedKey = strategy.getReplacedKey();
+        val replacedKey = strategy.getReplacedKey();
         if (firstLevelCache.isObjectPresent(replacedKey)) {
             log.debug(format("Replace object with key %s from 1st level", replacedKey));
             firstLevelCache.removeObjectFromCache(replacedKey);

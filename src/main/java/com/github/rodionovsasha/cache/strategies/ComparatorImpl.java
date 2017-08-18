@@ -1,6 +1,7 @@
 package com.github.rodionovsasha.cache.strategies;
 
 import lombok.AllArgsConstructor;
+import lombok.val;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -18,8 +19,8 @@ class ComparatorImpl<K> implements Comparator<K>, Serializable {
 
     @Override
     public int compare(K key1, K key2) {
-        Long key1Long = comparatorMap.get(key1);
-        Long key2Long = comparatorMap.get(key2);
+        val key1Long = comparatorMap.get(key1);
+        val key2Long = comparatorMap.get(key2);
         if (key1Long > key2Long) {
             return 1;  //key1 must be later than key2
         }
