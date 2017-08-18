@@ -36,6 +36,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
         this.objectsStorage = new ConcurrentHashMap<>(capacity);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized V getObjectFromCache(K key) {
         if (isObjectPresent(key)) {
