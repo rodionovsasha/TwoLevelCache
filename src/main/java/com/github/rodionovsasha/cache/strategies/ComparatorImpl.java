@@ -13,7 +13,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 class ComparatorImpl<K> implements Comparator<K>, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1;
 
     private final Map<K, Long> comparatorMap;
 

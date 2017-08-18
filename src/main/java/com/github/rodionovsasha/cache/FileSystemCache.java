@@ -7,6 +7,7 @@ import lombok.val;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.String.format;
@@ -17,7 +18,7 @@ import static java.lang.String.format;
 
 @Slf4j
 class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
-    private final ConcurrentHashMap<K, String> objectsStorage;
+    private final Map<K, String> objectsStorage;
     private final Path tempDir;
     private int capacity;
 
