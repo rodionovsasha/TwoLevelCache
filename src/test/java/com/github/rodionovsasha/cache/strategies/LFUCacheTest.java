@@ -51,4 +51,15 @@ public class LFUCacheTest {
         assertTrue(twoLevelCache.isObjectPresent(3));
         assertTrue(twoLevelCache.isObjectPresent(4));
     }
+
+    @Test
+    public void shouldNotRemoveObjectIfNotPresentTest() {
+        twoLevelCache = new TwoLevelCache<>(1, 1, LFU);
+
+        twoLevelCache.putObjectIntoCache(0, "String 0");
+        twoLevelCache.putObjectIntoCache(1, "String 1");
+
+        twoLevelCache.removeObjectFromCache(2);
+
+    }
 }
