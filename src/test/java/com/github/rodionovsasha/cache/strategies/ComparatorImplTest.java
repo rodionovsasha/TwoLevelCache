@@ -54,4 +54,13 @@ public class ComparatorImplTest {
         //Then
         assertEquals(-1, result);
     }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldInitNPE() throws Exception {
+        //Given
+        comparatorMap.put("key1", 1L);
+        comparatorMap.put("key2", null);
+        //When
+        comparator.compare("key1", "key2");
+    }
 }
