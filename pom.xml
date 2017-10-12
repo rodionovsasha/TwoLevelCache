@@ -98,9 +98,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <excludes>
-                        <exclude>com/github/rodionovsasha/cache/FileSystemCache.class</exclude>
-                    </excludes>
                     <rules>
                         <rule implementation="org.jacoco.maven.RuleConfiguration">
                             <element>BUNDLE</element>
@@ -108,7 +105,7 @@
                                 <limit implementation="org.jacoco.report.check.Limit">
                                     <counter>INSTRUCTION</counter>
                                     <value>COVEREDRATIO</value>
-                                    <minimum>0.95</minimum>
+                                    <minimum>0.80</minimum>
                                 </limit>
                                 <limit implementation="org.jacoco.report.check.Limit">
                                     <counter>CLASS</counter>
