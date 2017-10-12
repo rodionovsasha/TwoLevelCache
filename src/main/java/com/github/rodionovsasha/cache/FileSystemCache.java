@@ -58,10 +58,9 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     public synchronized void putToCache(K key, V value) {
         val tmpFile = Files.createTempFile(tempDir, "", "").toFile();
 
-        try (val fileOutputStream = new FileOutputStream(tmpFile);
-             val objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            objectOutputStream.writeObject(value);
-            objectOutputStream.flush();
+        try (val outputStream = new ObjectOutputStream(new FileOutputStream(tmpFile))) {
+            outputStream.writeObject(value);
+            outputStream.flush();
             objectsStorage.put(key, tmpFile.getName());
         } catch (IOException e) {
             log.error("Can't write an object to a file " + tmpFile.getName() + ": " + e.getMessage());
