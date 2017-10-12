@@ -30,37 +30,37 @@ public class FileSystemCacheTest {
 
     @Test
     public void shouldPutGetAndRemoveObjectTest() {
-        fileSystemCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
+        fileSystemCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, fileSystemCache.getFromCache(0));
         assertEquals(1, fileSystemCache.getCacheSize());
 
-        fileSystemCache.removeObjectFromCache(0);
-        assertNull(fileSystemCache.getObjectFromCache(0));
+        fileSystemCache.removeFromCache(0);
+        assertNull(fileSystemCache.getFromCache(0));
     }
 
     @Test
     public void shouldNotGetObjectFromCacheIfNotExistsTest() {
-        fileSystemCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
-        assertNull(fileSystemCache.getObjectFromCache(111));
+        fileSystemCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, fileSystemCache.getFromCache(0));
+        assertNull(fileSystemCache.getFromCache(111));
     }
 
     @Test
     public void shouldNotRemoveObjectFromCacheIfNotExistsTest() {
-        fileSystemCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
+        fileSystemCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, fileSystemCache.getFromCache(0));
         assertEquals(1, fileSystemCache.getCacheSize());
 
-        fileSystemCache.removeObjectFromCache(5);
-        assertEquals(VALUE1, fileSystemCache.getObjectFromCache(0));
+        fileSystemCache.removeFromCache(5);
+        assertEquals(VALUE1, fileSystemCache.getFromCache(0));
     }
 
     @Test
     public void shouldGetCacheSizeTest() {
-        fileSystemCache.putObjectIntoCache(0, VALUE1);
+        fileSystemCache.putToCache(0, VALUE1);
         assertEquals(1, fileSystemCache.getCacheSize());
 
-        fileSystemCache.putObjectIntoCache(1, VALUE2);
+        fileSystemCache.putToCache(1, VALUE2);
         assertEquals(2, fileSystemCache.getCacheSize());
     }
 
@@ -68,7 +68,7 @@ public class FileSystemCacheTest {
     public void isObjectPresentTest() {
         assertFalse(fileSystemCache.isObjectPresent(0));
 
-        fileSystemCache.putObjectIntoCache(0, VALUE1);
+        fileSystemCache.putToCache(0, VALUE1);
         assertTrue(fileSystemCache.isObjectPresent(0));
     }
 
@@ -76,15 +76,15 @@ public class FileSystemCacheTest {
     public void isEmptyPlaceTest() {
         fileSystemCache = new FileSystemCache<>(5);
 
-        IntStream.range(0, 4).forEach(i -> fileSystemCache.putObjectIntoCache(i, "String " + i));
+        IntStream.range(0, 4).forEach(i -> fileSystemCache.putToCache(i, "String " + i));
         assertTrue(fileSystemCache.hasEmptyPlace());
-        fileSystemCache.putObjectIntoCache(5, "String");
+        fileSystemCache.putToCache(5, "String");
         assertFalse(fileSystemCache.hasEmptyPlace());
     }
 
     @Test
     public void shouldClearCacheTest() {
-        IntStream.range(0, 3).forEach(i -> fileSystemCache.putObjectIntoCache(i, "String " + i));
+        IntStream.range(0, 3).forEach(i -> fileSystemCache.putToCache(i, "String " + i));
 
         assertEquals(3, fileSystemCache.getCacheSize());
         fileSystemCache.clearCache();

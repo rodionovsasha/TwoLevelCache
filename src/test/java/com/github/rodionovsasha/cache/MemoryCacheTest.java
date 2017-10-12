@@ -30,37 +30,37 @@ public class MemoryCacheTest {
 
     @Test
     public void shouldPutGetAndRemoveObjectTest() {
-        memoryCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
+        memoryCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, memoryCache.getFromCache(0));
         assertEquals(1, memoryCache.getCacheSize());
 
-        memoryCache.removeObjectFromCache(0);
-        assertNull(memoryCache.getObjectFromCache(0));
+        memoryCache.removeFromCache(0);
+        assertNull(memoryCache.getFromCache(0));
     }
 
     @Test
     public void shouldNotGetObjectFromCacheIfNotExistsTest() {
-        memoryCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
-        assertNull(memoryCache.getObjectFromCache(111));
+        memoryCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, memoryCache.getFromCache(0));
+        assertNull(memoryCache.getFromCache(111));
     }
 
     @Test
     public void shouldNotRemoveObjectFromCacheIfNotExistsTest() {
-        memoryCache.putObjectIntoCache(0, VALUE1);
-        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
+        memoryCache.putToCache(0, VALUE1);
+        assertEquals(VALUE1, memoryCache.getFromCache(0));
         assertEquals(1, memoryCache.getCacheSize());
 
-        memoryCache.removeObjectFromCache(5);
-        assertEquals(VALUE1, memoryCache.getObjectFromCache(0));
+        memoryCache.removeFromCache(5);
+        assertEquals(VALUE1, memoryCache.getFromCache(0));
     }
 
     @Test
     public void shouldGetCacheSizeTest() {
-        memoryCache.putObjectIntoCache(0, VALUE1);
+        memoryCache.putToCache(0, VALUE1);
         assertEquals(1, memoryCache.getCacheSize());
 
-        memoryCache.putObjectIntoCache(1, VALUE2);
+        memoryCache.putToCache(1, VALUE2);
         assertEquals(2, memoryCache.getCacheSize());
     }
 
@@ -68,7 +68,7 @@ public class MemoryCacheTest {
     public void isObjectPresentTest() {
         assertFalse(memoryCache.isObjectPresent(0));
 
-        memoryCache.putObjectIntoCache(0, VALUE1);
+        memoryCache.putToCache(0, VALUE1);
         assertTrue(memoryCache.isObjectPresent(0));
     }
 
@@ -76,16 +76,16 @@ public class MemoryCacheTest {
     public void isEmptyPlaceTest() {
         memoryCache = new MemoryCache<>(5);
 
-        IntStream.range(0, 4).forEach(i -> memoryCache.putObjectIntoCache(i, "String " + i));
+        IntStream.range(0, 4).forEach(i -> memoryCache.putToCache(i, "String " + i));
 
         assertTrue(memoryCache.hasEmptyPlace());
-        memoryCache.putObjectIntoCache(5, "String");
+        memoryCache.putToCache(5, "String");
         assertFalse(memoryCache.hasEmptyPlace());
     }
 
     @Test
     public void shouldClearCacheTest() {
-        IntStream.range(0, 3).forEach(i -> memoryCache.putObjectIntoCache(i, "String " + i));
+        IntStream.range(0, 3).forEach(i -> memoryCache.putToCache(i, "String " + i));
 
         assertEquals(3, memoryCache.getCacheSize());
         memoryCache.clearCache();

@@ -5,9 +5,9 @@ package com.github.rodionovsasha.cache;
  */
 
 interface Cache<K, V> {
-    void putObjectIntoCache(K key, V value);
-    V getObjectFromCache(K key);
-    void removeObjectFromCache(K key);
+    void putToCache(K key, V value);
+    V getFromCache(K key);
+    void removeFromCache(K key);
     int getCacheSize();
     boolean isObjectPresent(K key);
     boolean hasEmptyPlace();

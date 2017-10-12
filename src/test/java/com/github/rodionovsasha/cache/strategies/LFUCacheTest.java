@@ -24,26 +24,26 @@ public class LFUCacheTest {
     public void shouldMoveObjectFromCacheTest() {
         twoLevelCache = new TwoLevelCache<>(2, 2, LFU);
 
-        twoLevelCache.putObjectIntoCache(0, "String 0");
-        twoLevelCache.getObjectFromCache(0);
-        twoLevelCache.getObjectFromCache(0);
-        twoLevelCache.putObjectIntoCache(1, "String 1");
-        twoLevelCache.getObjectFromCache(1); // Least Frequently Used - will be removed
-        twoLevelCache.putObjectIntoCache(2, "String 2");
-        twoLevelCache.getObjectFromCache(2);
-        twoLevelCache.getObjectFromCache(2);
-        twoLevelCache.putObjectIntoCache(3, "String 3");
-        twoLevelCache.getObjectFromCache(3);
-        twoLevelCache.getObjectFromCache(3);
+        twoLevelCache.putToCache(0, "String 0");
+        twoLevelCache.getFromCache(0);
+        twoLevelCache.getFromCache(0);
+        twoLevelCache.putToCache(1, "String 1");
+        twoLevelCache.getFromCache(1); // Least Frequently Used - will be removed
+        twoLevelCache.putToCache(2, "String 2");
+        twoLevelCache.getFromCache(2);
+        twoLevelCache.getFromCache(2);
+        twoLevelCache.putToCache(3, "String 3");
+        twoLevelCache.getFromCache(3);
+        twoLevelCache.getFromCache(3);
 
         assertTrue(twoLevelCache.isObjectPresent(0));
         assertTrue(twoLevelCache.isObjectPresent(1));
         assertTrue(twoLevelCache.isObjectPresent(2));
         assertTrue(twoLevelCache.isObjectPresent(3));
 
-        twoLevelCache.putObjectIntoCache(4, "String 4");
-        twoLevelCache.getObjectFromCache(4);
-        twoLevelCache.getObjectFromCache(4);
+        twoLevelCache.putToCache(4, "String 4");
+        twoLevelCache.getFromCache(4);
+        twoLevelCache.getFromCache(4);
 
         assertTrue(twoLevelCache.isObjectPresent(0));
         assertFalse(twoLevelCache.isObjectPresent(1)); // Least Frequently Used - has been removed
@@ -56,10 +56,10 @@ public class LFUCacheTest {
     public void shouldNotRemoveObjectIfNotPresentTest() {
         twoLevelCache = new TwoLevelCache<>(1, 1, LFU);
 
-        twoLevelCache.putObjectIntoCache(0, "String 0");
-        twoLevelCache.putObjectIntoCache(1, "String 1");
+        twoLevelCache.putToCache(0, "String 0");
+        twoLevelCache.putToCache(1, "String 1");
 
-        twoLevelCache.removeObjectFromCache(2);
+        twoLevelCache.removeFromCache(2);
 
     }
 }

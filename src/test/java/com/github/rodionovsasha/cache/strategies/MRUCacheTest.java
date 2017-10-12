@@ -28,12 +28,12 @@ public class MRUCacheTest {
 
         // i=3 - Most Recently Used - will be removed
         IntStream.range(0, 4).forEach(i -> {
-            twoLevelCache.putObjectIntoCache(i, "String " + i);
+            twoLevelCache.putToCache(i, "String " + i);
             assertTrue(twoLevelCache.isObjectPresent(i));
-            twoLevelCache.getObjectFromCache(i);
+            twoLevelCache.getFromCache(i);
         });
 
-        twoLevelCache.putObjectIntoCache(4, "String 4");
+        twoLevelCache.putToCache(4, "String 4");
 
         assertTrue(twoLevelCache.isObjectPresent(0));
         assertTrue(twoLevelCache.isObjectPresent(1));

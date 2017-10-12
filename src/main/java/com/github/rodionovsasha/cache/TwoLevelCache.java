@@ -45,16 +45,16 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     }
 
     @Override
-    public synchronized void putObjectIntoCache(K newKey, V newValue) {
+    public synchronized void putToCache(K newKey, V newValue) {
         if (firstLevelCache.isObjectPresent(newKey) || firstLevelCache.hasEmptyPlace()) {
             log.debug(format("Put object with key %s to the 1st level", newKey));
-            firstLevelCache.putObjectIntoCache(newKey, newValue);
+            firstLevelCache.putToCache(newKey, newValue);
             if (secondLevelCache.isObjectPresent(newKey)) {
-                secondLevelCache.removeObjectFromCache(newKey);
+                secondLevelCache.removeFromCache(newKey);
             }
         } else if (secondLevelCache.isObjectPresent(newKey) || secondLevelCache.hasEmptyPlace()) {
             log.debug(format("Put object with key %s to the 2nd level", newKey));
-            secondLevelCache.putObjectIntoCache(newKey, newValue);
+            secondLevelCache.putToCache(newKey, newValue);
         } else {
             // Here we have full cache and have to replace some object with new one according to cache strategy.
             replaceObject(newKey, newValue);
@@ -70,36 +70,36 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
         val replacedKey = strategy.getReplacedKey();
         if (firstLevelCache.isObjectPresent(replacedKey)) {
             log.debug(format("Replace object with key %s from 1st level", replacedKey));
-            firstLevelCache.removeObjectFromCache(replacedKey);
-            firstLevelCache.putObjectIntoCache(key, value);
+            firstLevelCache.removeFromCache(replacedKey);
+            firstLevelCache.putToCache(key, value);
         } else if (secondLevelCache.isObjectPresent(replacedKey)) {
             log.debug(format("Replace object with key %s from 2nd level", replacedKey));
-            secondLevelCache.removeObjectFromCache(replacedKey);
-            secondLevelCache.putObjectIntoCache(key, value);
+            secondLevelCache.removeFromCache(replacedKey);
+            secondLevelCache.putToCache(key, value);
         }
     }
 
     @Override
-    public synchronized V getObjectFromCache(K key) {
+    public synchronized V getFromCache(K key) {
         if (firstLevelCache.isObjectPresent(key)) {
             strategy.putObject(key);
-            return firstLevelCache.getObjectFromCache(key);
+            return firstLevelCache.getFromCache(key);
         } else if (secondLevelCache.isObjectPresent(key)) {
             strategy.putObject(key);
-            return secondLevelCache.getObjectFromCache(key);
+            return secondLevelCache.getFromCache(key);
         }
         return null;
     }
 
     @Override
-    public synchronized void removeObjectFromCache(K key) {
+    public synchronized void removeFromCache(K key) {
         if (firstLevelCache.isObjectPresent(key)) {
             log.debug(format("Remove object with key %s from 1st level", key));
-            firstLevelCache.removeObjectFromCache(key);
+            firstLevelCache.removeFromCache(key);
         }
         if (secondLevelCache.isObjectPresent(key)) {
             log.debug(format("Remove object with key %s from 2nd level", key));
-            secondLevelCache.removeObjectFromCache(key);
+            secondLevelCache.removeFromCache(key);
         }
         strategy.removeObject(key);
     }
