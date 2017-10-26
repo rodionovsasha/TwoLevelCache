@@ -34,13 +34,13 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
 
     private CacheStrategy<K> getStrategy(StrategyType strategyType) {
         switch (strategyType) {
-        case LRU:
-            return new LRUStrategy<>();
-        case MRU:
-            return new MRUStrategy<>();
-        case LFU:
-        default:
-            return new LFUStrategy<>();
+            case LRU:
+                return new LRUStrategy<>();
+            case MRU:
+                return new MRUStrategy<>();
+            case LFU:
+            default:
+                return new LFUStrategy<>();
         }
     }
 

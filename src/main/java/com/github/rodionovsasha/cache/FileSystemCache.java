@@ -44,7 +44,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
             val fileName = objectsStorage.get(key);
             try (val fileInputStream = new FileInputStream(new File(tempDir + File.separator + fileName));
                  val objectInputStream = new ObjectInputStream(fileInputStream)) {
-                return (V)objectInputStream.readObject();
+                return (V) objectInputStream.readObject();
             } catch (ClassNotFoundException | IOException e) {
                 log.error(format("Can't read a file. %s: %s", fileName, e.getMessage()));
             }
