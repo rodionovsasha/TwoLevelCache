@@ -1,6 +1,10 @@
 package com.github.rodionovsasha.cache;
 
-import com.github.rodionovsasha.cache.strategies.*;
+import com.github.rodionovsasha.cache.strategies.CacheStrategy;
+import com.github.rodionovsasha.cache.strategies.LFUStrategy;
+import com.github.rodionovsasha.cache.strategies.LRUStrategy;
+import com.github.rodionovsasha.cache.strategies.MRUStrategy;
+import com.github.rodionovsasha.cache.strategies.StrategyType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

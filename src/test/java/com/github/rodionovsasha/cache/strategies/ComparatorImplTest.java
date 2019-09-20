@@ -23,7 +23,7 @@ public class ComparatorImplTest {
     }
 
     @Test
-    public void keysShouldBeEquals() throws Exception {
+    public void keysShouldBeEquals() {
         //Given
         comparatorMap.put("key1", 1L);
         comparatorMap.put("key2", 1L);
@@ -34,7 +34,7 @@ public class ComparatorImplTest {
     }
 
     @Test
-    public void key1ShouldBeLaterThanKey2() throws Exception {
+    public void key1ShouldBeLaterThanKey2() {
         //Given
         comparatorMap.put("key1", 2L);
         comparatorMap.put("key2", 1L);
@@ -45,7 +45,7 @@ public class ComparatorImplTest {
     }
 
     @Test
-    public void key1ShouldBeEarlierThanKey2() throws Exception {
+    public void key1ShouldBeEarlierThanKey2() {
         //Given
         comparatorMap.put("key1", 1L);
         comparatorMap.put("key2", 2L);
@@ -56,7 +56,7 @@ public class ComparatorImplTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void shouldInitNPE() throws Exception {
+    public void shouldInitNPE() {
         //Given
         comparatorMap.put("key1", 1L);
         comparatorMap.put("key2", null);

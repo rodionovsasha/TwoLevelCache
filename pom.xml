@@ -30,15 +30,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <log4j.version>2.9.1</log4j.version>
+        <java.version>13</java.version>
+        <log4j.version>2.12.1</log4j.version>
         <junit.version>4.12</junit.version>
-        <lombok.version>1.16.18</lombok.version>
+        <lombok.version>1.18.10</lombok.version>
         <!--Plugins-->
-        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
-        <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
-        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
-        <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
+        <spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
+        <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
     </properties>
 
@@ -120,9 +120,9 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs-maven-plugin.version}</version>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
                 <configuration>
                     <!-- Enables analysis which takes more memory but finds more bugs.
                     If you run out of memory, changes the value of the effort element to 'low'.-->
@@ -132,7 +132,7 @@
                     <xmlOutput>true</xmlOutput>
                 </configuration>
                 <executions>
-                    <!-- Ensures that FindBugs inspects source code when project is compiled.-->
+                    <!-- Ensures that spotbugs inspects source code when project is compiled.-->
                     <execution>
                         <id>analyze-compile</id>
                         <phase>compile</phase>

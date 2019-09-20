@@ -154,7 +154,7 @@ public class TwoLevelCacheTest {
 
         twoLevelCache.putToCache(3, VALUE3);
 
-        assertTrue(twoLevelCache.getFromCache(3).equals(VALUE3));
+        assertEquals(twoLevelCache.getFromCache(3), VALUE3);
         assertTrue(twoLevelCache.getStrategy().isObjectPresent(3));
         assertTrue(twoLevelCache.getFirstLevelCache().isObjectPresent(3));
         assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(3));
