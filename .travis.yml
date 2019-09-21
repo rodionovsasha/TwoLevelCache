@@ -7,7 +7,7 @@ jdk:
 
 install: true
 
-script: mvn clean install coveralls:report
+script: mvn clean install
 
 branches:
   only:
