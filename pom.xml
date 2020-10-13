@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>13</java.version>
         <log4j.version>2.12.1</log4j.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <lombok.version>1.18.10</lombok.version>
         <!--Plugins-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
