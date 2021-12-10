@@ -31,7 +31,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>13</java.version>
-        <log4j.version>2.12.1</log4j.version>
+        <log4j.version>2.14.1</log4j.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.10</lombok.version>
         <!--Plugins-->
