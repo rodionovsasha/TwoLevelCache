@@ -6,7 +6,6 @@ import com.github.rodionovsasha.cache.strategies.LRUStrategy;
 import com.github.rodionovsasha.cache.strategies.MRUStrategy;
 import com.github.rodionovsasha.cache.strategies.StrategyType;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 import java.io.Serializable;
 
@@ -23,15 +22,26 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     private final CacheStrategy<K> strategy;
 
     public TwoLevelCache(final int memoryCapacity, final int fileCapacity, final StrategyType strategyType) {
+        validateCapacity(memoryCapacity, fileCapacity);
         this.firstLevelCache = new MemoryCache<>(memoryCapacity);
         this.secondLevelCache = new FileSystemCache<>(fileCapacity);
         this.strategy = getStrategy(strategyType);
     }
 
     public TwoLevelCache(final int memoryCapacity, final int fileCapacity) {
+        validateCapacity(memoryCapacity, fileCapacity);
         this.firstLevelCache = new MemoryCache<>(memoryCapacity);
         this.secondLevelCache = new FileSystemCache<>(fileCapacity);
         this.strategy = getStrategy(StrategyType.LFU);
+    }
+
+    private static void validateCapacity(final int memoryCapacity, final int fileCapacity) {
+        if (memoryCapacity < 0 || fileCapacity < 0) {
+            throw new IllegalArgumentException("Cache capacities must not be negative");
+        }
+        if ((long) memoryCapacity + fileCapacity == 0) {
+            throw new IllegalArgumentException("Total cache capacity must be greater than zero");
+        }
     }
 
     MemoryCache<K, V> getFirstLevelCache() {
@@ -70,14 +80,12 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
             replaceObject(newKey, newValue);
         }
 
-        if (!strategy.isObjectPresent(newKey)) {
-            log.debug(format("Put object with key %s to strategy", newKey));
-            strategy.putObject(newKey);
-        }
+        log.debug(format("Put object with key %s to strategy", newKey));
+        strategy.putObject(newKey);
     }
 
     private void replaceObject(K key, V value) {
-        val replacedKey = strategy.getReplacedKey();
+        var replacedKey = strategy.getReplacedKey();
         if (firstLevelCache.isObjectPresent(replacedKey)) {
             log.debug(format("Replace object with key %s from 1st level", replacedKey));
             firstLevelCache.removeFromCache(replacedKey);
@@ -87,6 +95,7 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
             secondLevelCache.removeFromCache(replacedKey);
             secondLevelCache.putToCache(key, value);
         }
+        strategy.removeObject(replacedKey);
     }
 
     @Override

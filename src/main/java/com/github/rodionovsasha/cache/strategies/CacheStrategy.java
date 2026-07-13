@@ -1,5 +1,6 @@
 package com.github.rodionovsasha.cache.strategies;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +13,7 @@ public abstract class CacheStrategy<K> {
     private final TreeMap<K, Long> sortedObjectsStorage;
 
     CacheStrategy() {
-        this.objectsStorage = new TreeMap<>();
+        this.objectsStorage = new HashMap<>();
         this.sortedObjectsStorage = new TreeMap<>(new ComparatorImpl<>(objectsStorage));
     }
 

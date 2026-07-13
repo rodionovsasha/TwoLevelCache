@@ -1,7 +1,6 @@
 package com.github.rodionovsasha.cache;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,9 +51,9 @@ final class FileSystemCache<K extends Serializable, V extends Serializable> impl
     @Override
     public synchronized V getFromCache(K key) {
         if (isObjectPresent(key)) {
-            val fileName = objectsStorage.get(key);
-            try (val fileInputStream = new FileInputStream(tempDir + File.separator + fileName);
-                 val objectInputStream = new ObjectInputStream(fileInputStream)) {
+            var fileName = objectsStorage.get(key);
+            try (var fileInputStream = new FileInputStream(tempDir + File.separator + fileName);
+                 var objectInputStream = new ObjectInputStream(fileInputStream)) {
                 return (V) objectInputStream.readObject();
             } catch (ClassNotFoundException | IOException e) {
                 log.error(format("Can't read a file. %s: %s", fileName, e.getMessage()));
@@ -74,29 +73,39 @@ final class FileSystemCache<K extends Serializable, V extends Serializable> impl
             return;
         }
 
-        try (val outputStream = new ObjectOutputStream(new FileOutputStream(tmpFile))) {
+        try (var outputStream = new ObjectOutputStream(new FileOutputStream(tmpFile))) {
             outputStream.writeObject(value);
             outputStream.flush();
-            objectsStorage.put(key, tmpFile.getName());
+            var replacedFileName = objectsStorage.put(key, tmpFile.getName());
+            deleteFile(replacedFileName);
         } catch (IOException e) {
             log.error("Can't write an object to a file " + tmpFile.getName() + ": " + e.getMessage());
+            deleteFile(tmpFile.getName());
         }
     }
 
-    @Override
-    public synchronized void removeFromCache(K key) {
-        val fileName = objectsStorage.get(key);
+    private void deleteFile(String fileName) {
         if (fileName == null) {
-            log.debug(format("Object with key '%s' does not exist", key));
             return;
         }
 
-        val deletedFile = new File(tempDir + File.separator + fileName);
+        var deletedFile = new File(tempDir + File.separator + fileName);
         if (deletedFile.delete()) {
             log.debug(format("Cache file '%s' has been deleted", fileName));
         } else {
             log.debug(format("Can't delete a file %s", fileName));
         }
+    }
+
+    @Override
+    public synchronized void removeFromCache(K key) {
+        var fileName = objectsStorage.get(key);
+        if (fileName == null) {
+            log.debug(format("Object with key '%s' does not exist", key));
+            return;
+        }
+
+        deleteFile(fileName);
         objectsStorage.remove(key);
     }
 
@@ -117,7 +126,7 @@ final class FileSystemCache<K extends Serializable, V extends Serializable> impl
 
     @Override
     public void clearCache() {
-        try (val files = Files.walk(tempDir)) {
+        try (var files = Files.walk(tempDir)) {
             files.filter(Files::isRegularFile)
                     .map(Path::toFile)
                     .forEach(file -> {

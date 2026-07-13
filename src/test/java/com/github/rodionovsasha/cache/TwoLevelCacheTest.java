@@ -5,6 +5,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -161,6 +164,31 @@ public class TwoLevelCacheTest {
     }
 
     @Test
+    public void shouldRemoveReplacedObjectFromStrategyTest() {
+        twoLevelCache.putToCache(0, VALUE1);
+        twoLevelCache.putToCache(1, VALUE2);
+
+        twoLevelCache.putToCache(2, VALUE3);
+
+        assertFalse(twoLevelCache.isObjectPresent(0));
+        assertFalse(twoLevelCache.getStrategy().isObjectPresent(0));
+        assertTrue(twoLevelCache.isObjectPresent(2));
+        assertTrue(twoLevelCache.getStrategy().isObjectPresent(2));
+    }
+
+    @Test
+    public void shouldContinueCachingAfterRepeatedReplacementsTest() {
+        twoLevelCache.putToCache(0, VALUE1);
+        twoLevelCache.putToCache(1, VALUE2);
+
+        twoLevelCache.putToCache(2, VALUE3);
+        twoLevelCache.putToCache(3, "value4");
+
+        assertEquals("value4", twoLevelCache.getFromCache(3));
+        assertEquals(2, twoLevelCache.getCacheSize());
+    }
+
+    @Test
     public void shouldGetCacheSizeTest() {
         twoLevelCache.putToCache(0, VALUE1);
         assertEquals(1, twoLevelCache.getCacheSize());
@@ -219,5 +247,56 @@ public class TwoLevelCacheTest {
         assertEquals(VALUE1, twoLevelCache.getFromCache(0));
         assertEquals(VALUE1, twoLevelCache.getFirstLevelCache().getFromCache(0));
         assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(0));
+    }
+
+    @Test
+    public void shouldRejectInvalidCapacityTest() {
+        assertThrows(IllegalArgumentException.class, () -> new TwoLevelCache<>(-1, 1));
+        assertThrows(IllegalArgumentException.class, () -> new TwoLevelCache<>(1, -1));
+        assertThrows(IllegalArgumentException.class, () -> new TwoLevelCache<>(0, 0));
+    }
+
+    @Test
+    public void shouldSupportSerializableKeysWithoutNaturalOrderingTest() {
+        TwoLevelCache<CustomKey, String> cache = new TwoLevelCache<>(1, 1);
+        CustomKey key1 = new CustomKey("key1");
+        CustomKey key2 = new CustomKey("key2");
+
+        try {
+            cache.putToCache(key1, VALUE1);
+            cache.putToCache(key2, VALUE2);
+
+            assertEquals(VALUE1, cache.getFromCache(key1));
+            assertEquals(VALUE2, cache.getFromCache(key2));
+        } finally {
+            cache.clearCache();
+        }
+    }
+
+    private static final class CustomKey implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1;
+
+        private final String value;
+
+        private CustomKey(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (!(object instanceof CustomKey customKey)) {
+                return false;
+            }
+            return Objects.equals(value, customKey.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
     }
 }

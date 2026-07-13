@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
  * Copyright (©) 2017. Rodionov Aleksandr
@@ -24,14 +25,14 @@ public class ComparatorImplTest {
     }
 
     @Test
-    public void keysShouldBeEquals() {
+    public void differentKeysWithEqualValuesShouldNotBeEquals() {
         //Given
         comparatorMap.put("key1", 1L);
         comparatorMap.put("key2", 1L);
         //When
         int result = comparator.compare("key1", "key2");
         //Then
-        assertEquals(0, result);
+        assertNotEquals(0, result);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class ComparatorImplTest {
         //When
         int result = comparator.compare("key1", "key2");
         //Then
-        assertEquals(1, result);
+        assertTrue(result > 0);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class ComparatorImplTest {
         //When
         int result = comparator.compare("key1", "key2");
         //Then
-        assertEquals(-1, result);
+        assertTrue(result < 0);
     }
 
     @Test
