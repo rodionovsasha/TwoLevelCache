@@ -1,6 +1,5 @@
 package com.github.rodionovsasha.cache;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -19,28 +18,34 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.String.format;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 @Slf4j
-class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+final class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private final Map<K, String> objectsStorage;
     private final Path tempDir;
     private int capacity;
 
-    @SneakyThrows
     FileSystemCache() {
-        this.tempDir = Files.createTempDirectory("cache");
+        this.tempDir = createTempDirectory();
         this.tempDir.toFile().deleteOnExit();
         this.objectsStorage = new ConcurrentHashMap<>();
     }
 
-    @SneakyThrows
     FileSystemCache(int capacity) {
-        this.tempDir = Files.createTempDirectory("cache");
+        this.tempDir = createTempDirectory();
         this.tempDir.toFile().deleteOnExit();
         this.capacity = capacity;
         this.objectsStorage = new ConcurrentHashMap<>(capacity);
+    }
+
+    private static Path createTempDirectory() {
+        try {
+            return Files.createTempDirectory("cache");
+        } catch (IOException e) {
+            throw new IllegalStateException("Can't create cache temp directory", e);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -48,7 +53,7 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     public synchronized V getFromCache(K key) {
         if (isObjectPresent(key)) {
             val fileName = objectsStorage.get(key);
-            try (val fileInputStream = new FileInputStream(new File(tempDir + File.separator + fileName));
+            try (val fileInputStream = new FileInputStream(tempDir + File.separator + fileName);
                  val objectInputStream = new ObjectInputStream(fileInputStream)) {
                 return (V) objectInputStream.readObject();
             } catch (ClassNotFoundException | IOException e) {
@@ -60,9 +65,14 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     }
 
     @Override
-    @SneakyThrows
     public synchronized void putToCache(K key, V value) {
-        val tmpFile = Files.createTempFile(tempDir, "", "").toFile();
+        File tmpFile;
+        try {
+            tmpFile = Files.createTempFile(tempDir, "", "").toFile();
+        } catch (IOException e) {
+            log.error("Can't create a cache file: " + e.getMessage());
+            return;
+        }
 
         try (val outputStream = new ObjectOutputStream(new FileOutputStream(tmpFile))) {
             outputStream.writeObject(value);
@@ -76,6 +86,11 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
     @Override
     public synchronized void removeFromCache(K key) {
         val fileName = objectsStorage.get(key);
+        if (fileName == null) {
+            log.debug(format("Object with key '%s' does not exist", key));
+            return;
+        }
+
         val deletedFile = new File(tempDir + File.separator + fileName);
         if (deletedFile.delete()) {
             log.debug(format("Cache file '%s' has been deleted", fileName));
@@ -100,19 +115,21 @@ class FileSystemCache<K extends Serializable, V extends Serializable> implements
         return getCacheSize() < this.capacity;
     }
 
-    @SneakyThrows
     @Override
     public void clearCache() {
-        Files.walk(tempDir)
-                .filter(Files::isRegularFile)
-                .map(Path::toFile)
-                .forEach(file -> {
-                    if (file.delete()) {
-                        log.debug(format("Cache file '%s' has been deleted", file));
-                    } else {
-                        log.error(format("Can't delete a file %s", file));
-                    }
-                });
+        try (val files = Files.walk(tempDir)) {
+            files.filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .forEach(file -> {
+                        if (file.delete()) {
+                            log.debug(format("Cache file '%s' has been deleted", file));
+                        } else {
+                            log.error(format("Can't delete a file %s", file));
+                        }
+                    });
+        } catch (IOException e) {
+            log.error("Can't clear cache directory " + tempDir + ": " + e.getMessage());
+        }
         objectsStorage.clear();
     }
 }

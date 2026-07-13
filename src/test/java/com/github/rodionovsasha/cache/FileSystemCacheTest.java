@@ -1,15 +1,15 @@
 package com.github.rodionovsasha.cache;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 public class FileSystemCacheTest {
@@ -18,12 +18,12 @@ public class FileSystemCacheTest {
 
     private FileSystemCache<Integer, String> fileSystemCache;
 
-    @Before
+    @BeforeEach
     public void init() {
         fileSystemCache = new FileSystemCache<>();
     }
 
-    @After
+    @AfterEach
     public void clearCache() {
         fileSystemCache.clearCache();
     }

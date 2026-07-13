@@ -1,22 +1,23 @@
 package com.github.rodionovsasha.cache.strategies;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /*
- * Copyright (©) 2017. Rodionov Alexander
+ * Copyright (©) 2017. Rodionov Aleksandr
  */
 
 public class ComparatorImplTest {
     private ComparatorImpl<String> comparator;
     private Map<String, Long> comparatorMap;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         comparatorMap = new HashMap<>();
         comparator = new ComparatorImpl<>(comparatorMap);
@@ -55,12 +56,12 @@ public class ComparatorImplTest {
         assertEquals(-1, result);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldInitNPE() {
         //Given
         comparatorMap.put("key1", 1L);
         comparatorMap.put("key2", null);
-        //When
-        comparator.compare("key1", "key2");
+        //When / Then
+        assertThrows(NullPointerException.class, () -> comparator.compare("key1", "key2"));
     }
 }

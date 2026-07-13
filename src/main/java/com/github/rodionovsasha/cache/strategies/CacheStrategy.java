@@ -1,15 +1,12 @@
 package com.github.rodionovsasha.cache.strategies;
 
-import lombok.Getter;
-
 import java.util.Map;
 import java.util.TreeMap;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
-@Getter
 public abstract class CacheStrategy<K> {
     private final Map<K, Long> objectsStorage;
     private final TreeMap<K, Long> sortedObjectsStorage;
@@ -20,6 +17,14 @@ public abstract class CacheStrategy<K> {
     }
 
     public abstract void putObject(K key);
+
+    Map<K, Long> objectsStorage() {
+        return objectsStorage;
+    }
+
+    TreeMap<K, Long> sortedObjectsStorage() {
+        return sortedObjectsStorage;
+    }
 
     public void removeObject(K key) {
         if (isObjectPresent(key)) {
@@ -32,6 +37,7 @@ public abstract class CacheStrategy<K> {
     }
 
     public K getReplacedKey() {
+        sortedObjectsStorage.clear();
         sortedObjectsStorage.putAll(objectsStorage);
         return sortedObjectsStorage.firstKey();
     }

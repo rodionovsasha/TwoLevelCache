@@ -1,15 +1,15 @@
 package com.github.rodionovsasha.cache;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 public class MemoryCacheTest {
@@ -18,12 +18,12 @@ public class MemoryCacheTest {
 
     private MemoryCache<Integer, String> memoryCache;
 
-    @Before
+    @BeforeEach
     public void init() {
         memoryCache = new MemoryCache<>(3);
     }
 
-    @After
+    @AfterEach
     public void clearCache() {
         memoryCache.clearCache();
     }

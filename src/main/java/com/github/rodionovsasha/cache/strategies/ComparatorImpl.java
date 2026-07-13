@@ -3,16 +3,18 @@ package com.github.rodionovsasha.cache.strategies;
 import lombok.AllArgsConstructor;
 import lombok.val;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 @AllArgsConstructor
 class ComparatorImpl<K> implements Comparator<K>, Serializable {
+    @Serial
     private static final long serialVersionUID = 1;
 
     private final Map<K, Long> comparatorMap;

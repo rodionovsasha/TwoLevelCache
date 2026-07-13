@@ -1,12 +1,13 @@
 package com.github.rodionovsasha.cache.strategies;
 
 /*
- * Copyright (©) 2017. Rodionov Alexander
+ * Copyright (©) 2017. Rodionov Aleksandr
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StrategyTypeTest {
     @Test
@@ -16,8 +17,8 @@ public class StrategyTypeTest {
         assertEquals(StrategyType.MRU, StrategyType.valueOf("MRU"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenTypeIsNotCorrectTest() {
-        StrategyType.valueOf("wrong_value");
+        assertThrows(IllegalArgumentException.class, () -> StrategyType.valueOf("wrong_value"));
     }
 }

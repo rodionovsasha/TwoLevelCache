@@ -1,7 +1,7 @@
 package com.github.rodionovsasha.cache;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 interface Cache<K, V> {

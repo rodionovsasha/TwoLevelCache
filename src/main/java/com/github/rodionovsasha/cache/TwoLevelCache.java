@@ -5,7 +5,6 @@ import com.github.rodionovsasha.cache.strategies.LFUStrategy;
 import com.github.rodionovsasha.cache.strategies.LRUStrategy;
 import com.github.rodionovsasha.cache.strategies.MRUStrategy;
 import com.github.rodionovsasha.cache.strategies.StrategyType;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -14,11 +13,10 @@ import java.io.Serializable;
 import static java.lang.String.format;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 @Slf4j
-@Getter
 public class TwoLevelCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
     private final MemoryCache<K, V> firstLevelCache;
     private final FileSystemCache<K, V> secondLevelCache;
@@ -36,16 +34,24 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
         this.strategy = getStrategy(StrategyType.LFU);
     }
 
+    MemoryCache<K, V> getFirstLevelCache() {
+        return firstLevelCache;
+    }
+
+    FileSystemCache<K, V> getSecondLevelCache() {
+        return secondLevelCache;
+    }
+
+    CacheStrategy<K> getStrategy() {
+        return strategy;
+    }
+
     private CacheStrategy<K> getStrategy(StrategyType strategyType) {
-        switch (strategyType) {
-            case LRU:
-                return new LRUStrategy<>();
-            case MRU:
-                return new MRUStrategy<>();
-            case LFU:
-            default:
-                return new LFUStrategy<>();
-        }
+        return switch (strategyType) {
+            case LRU -> new LRUStrategy<>();
+            case MRU -> new MRUStrategy<>();
+            default -> new LFUStrategy<>();
+        };
     }
 
     @Override

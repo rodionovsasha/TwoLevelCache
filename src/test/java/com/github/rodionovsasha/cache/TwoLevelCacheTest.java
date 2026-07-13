@@ -1,16 +1,16 @@
 package com.github.rodionovsasha.cache;
 
 import com.github.rodionovsasha.cache.strategies.StrategyType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 public class TwoLevelCacheTest {
@@ -20,12 +20,12 @@ public class TwoLevelCacheTest {
 
     private TwoLevelCache<Integer, String> twoLevelCache;
 
-    @Before
+    @BeforeEach
     public void init() {
         twoLevelCache = new TwoLevelCache<>(1, 1);
     }
 
-    @After
+    @AfterEach
     public void clearCache() {
         twoLevelCache.clearCache();
     }
@@ -154,7 +154,7 @@ public class TwoLevelCacheTest {
 
         twoLevelCache.putToCache(3, VALUE3);
 
-        assertEquals(twoLevelCache.getFromCache(3), VALUE3);
+        assertEquals(VALUE3, twoLevelCache.getFromCache(3));
         assertTrue(twoLevelCache.getStrategy().isObjectPresent(3));
         assertTrue(twoLevelCache.getFirstLevelCache().isObjectPresent(3));
         assertFalse(twoLevelCache.getSecondLevelCache().isObjectPresent(3));

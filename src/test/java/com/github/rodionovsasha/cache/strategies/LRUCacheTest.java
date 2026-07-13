@@ -1,23 +1,23 @@
 package com.github.rodionovsasha.cache.strategies;
 
 import com.github.rodionovsasha.cache.TwoLevelCache;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
 import static com.github.rodionovsasha.cache.strategies.StrategyType.LRU;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
- * Copyright (©) 2017. Rodionov Alexander
+ * Copyright (©) 2017. Rodionov Aleksandr
  */
 
 public class LRUCacheTest {
     private TwoLevelCache<Integer, String> twoLevelCache;
 
-    @After
+    @AfterEach
     public void clearCache() {
         twoLevelCache.clearCache();
     }
