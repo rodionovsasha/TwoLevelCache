@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 class MemoryCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {

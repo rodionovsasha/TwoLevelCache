@@ -1,7 +1,7 @@
 package com.github.rodionovsasha.cache.strategies;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 /**
@@ -11,12 +11,13 @@ package com.github.rodionovsasha.cache.strategies;
 public class MRUStrategy<K> extends CacheStrategy<K> {
     @Override
     public void putObject(K key) {
-        getObjectsStorage().put(key, System.nanoTime());
+        objectsStorage().put(key, System.nanoTime());
     }
 
     @Override
     public K getReplacedKey() {
-        getSortedObjectsStorage().putAll(getObjectsStorage());
-        return getSortedObjectsStorage().lastKey();
+        sortedObjectsStorage().clear();
+        sortedObjectsStorage().putAll(objectsStorage());
+        return sortedObjectsStorage().lastKey();
     }
 }

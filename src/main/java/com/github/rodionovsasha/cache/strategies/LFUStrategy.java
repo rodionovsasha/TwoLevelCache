@@ -1,7 +1,7 @@
 package com.github.rodionovsasha.cache.strategies;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 /**
@@ -12,9 +12,9 @@ public class LFUStrategy<K> extends CacheStrategy<K> {
     @Override
     public void putObject(K key) {
         long frequency = 1;
-        if (getObjectsStorage().containsKey(key)) {
-            frequency = getObjectsStorage().get(key) + 1;
+        if (objectsStorage().containsKey(key)) {
+            frequency = objectsStorage().get(key) + 1;
         }
-        getObjectsStorage().put(key, frequency);
+        objectsStorage().put(key, frequency);
     }
 }

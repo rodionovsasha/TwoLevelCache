@@ -1,15 +1,19 @@
 package com.github.rodionovsasha.cache;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*
- * Copyright (©) 2014. Rodionov Alexander
+ * Copyright (©) 2014. Rodionov Aleksandr
  */
 
 public class FileSystemCacheTest {
@@ -18,12 +22,12 @@ public class FileSystemCacheTest {
 
     private FileSystemCache<Integer, String> fileSystemCache;
 
-    @Before
+    @BeforeEach
     public void init() {
         fileSystemCache = new FileSystemCache<>();
     }
 
-    @After
+    @AfterEach
     public void clearCache() {
         fileSystemCache.clearCache();
     }
@@ -65,6 +69,18 @@ public class FileSystemCacheTest {
     }
 
     @Test
+    public void shouldReplaceStoredFileWhenObjectIsUpdatedTest() throws Exception {
+        fileSystemCache.putToCache(0, VALUE1);
+        assertEquals(1, getStoredFileCount());
+
+        fileSystemCache.putToCache(0, VALUE2);
+
+        assertEquals(VALUE2, fileSystemCache.getFromCache(0));
+        assertEquals(1, fileSystemCache.getCacheSize());
+        assertEquals(1, getStoredFileCount());
+    }
+
+    @Test
     public void isObjectPresentTest() {
         assertFalse(fileSystemCache.isObjectPresent(0));
 
@@ -89,5 +105,15 @@ public class FileSystemCacheTest {
         assertEquals(3, fileSystemCache.getCacheSize());
         fileSystemCache.clearCache();
         assertEquals(0, fileSystemCache.getCacheSize());
+    }
+
+    private long getStoredFileCount() throws Exception {
+        Field tempDirField = FileSystemCache.class.getDeclaredField("tempDir");
+        tempDirField.setAccessible(true);
+        Path tempDir = (Path) tempDirField.get(fileSystemCache);
+
+        try (Stream<Path> files = Files.list(tempDir)) {
+            return files.filter(Files::isRegularFile).count();
+        }
     }
 }
