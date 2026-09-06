@@ -1,16 +1,16 @@
 package com.github.rodionovsasha.cache.strategies;
 
-/*
- * Copyright (©) 2014. Rodionov Aleksandr
- */
+import java.util.Optional;
 
-/**
- * LRU Strategy - Least Recently Used
- */
-
+/** LRU eviction based on access order, without clock-dependent priorities. */
 public class LRUStrategy<K> extends CacheStrategy<K> {
     @Override
     public void putObject(K key) {
-        objectsStorage().put(key, System.nanoTime());
+        recordRecency(key);
+    }
+
+    @Override
+    public Optional<K> selectVictim() {
+        return selectByRecency(false);
     }
 }

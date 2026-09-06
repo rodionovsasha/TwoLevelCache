@@ -81,7 +81,7 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
         }
 
         log.debug(format("Put object with key %s to strategy", newKey));
-        strategy.putObject(newKey);
+        strategy.onInsert(newKey);
     }
 
     private void replaceObject(K key, V value) {
@@ -101,10 +101,10 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     @Override
     public synchronized V getFromCache(K key) {
         if (firstLevelCache.isObjectPresent(key)) {
-            strategy.putObject(key);
+            strategy.onAccess(key);
             return firstLevelCache.getFromCache(key);
         } else if (secondLevelCache.isObjectPresent(key)) {
-            strategy.putObject(key);
+            strategy.onAccess(key);
             return secondLevelCache.getFromCache(key);
         }
         return null;
@@ -134,7 +134,7 @@ public class TwoLevelCache<K extends Serializable, V extends Serializable> imple
     }
 
     @Override
-    public void clearCache() {
+    public synchronized void clearCache() {
         firstLevelCache.clearCache();
         secondLevelCache.clearCache();
         strategy.clear();
