@@ -34,6 +34,32 @@ public class TwoLevelCacheTest {
     }
 
     @Test
+    void shouldReportSpaceUntilBothLevelsAreFull() {
+        assertTrue(twoLevelCache.hasEmptyPlace());
+        twoLevelCache.putToCache(0, VALUE1);
+        assertTrue(twoLevelCache.hasEmptyPlace());
+        twoLevelCache.putToCache(1, VALUE2);
+        assertFalse(twoLevelCache.hasEmptyPlace());
+    }
+
+    @Test
+    void shouldDiscardStaleVictimMetadataWithoutRemovingStoredEntries() {
+        twoLevelCache.putToCache(0, VALUE1);
+        twoLevelCache.putToCache(1, VALUE2);
+        // Simulate metadata left behind by a failed storage write.
+        twoLevelCache.getStrategy().onInsert(-1);
+        twoLevelCache.getFromCache(0);
+        twoLevelCache.getFromCache(1);
+        twoLevelCache.putToCache(2, VALUE3);
+        assertFalse(twoLevelCache.getStrategy().isObjectPresent(-1));
+        assertEquals(VALUE1, twoLevelCache.getFromCache(0));
+        assertEquals(VALUE2, twoLevelCache.getFromCache(1));
+        assertEquals(2, twoLevelCache.getCacheSize());
+        // Documents current behavior: this insertion is lost when the victim is stale.
+        assertNull(twoLevelCache.getFromCache(2));
+    }
+
+    @Test
     public void shouldPutGetAndRemoveObjectTest() {
         twoLevelCache.putToCache(0, VALUE1);
         assertEquals(VALUE1, twoLevelCache.getFromCache(0));

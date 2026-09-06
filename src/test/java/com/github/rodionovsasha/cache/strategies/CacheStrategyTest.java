@@ -12,6 +12,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CacheStrategyTest {
     @Test
+    void shouldSaturateFrequencyInsteadOfOverflowing() {
+        var strategy = new LFUStrategy<String>();
+        strategy.onInsert("hot");
+        strategy.onInsert("cold");
+        strategy.objectsStorage().put("hot", Long.MAX_VALUE - 1);
+        strategy.onAccess("hot");
+        assertEquals(Long.MAX_VALUE, strategy.objectsStorage().get("hot"));
+        strategy.onAccess("hot");
+        assertEquals(Long.MAX_VALUE, strategy.objectsStorage().get("hot"));
+        assertEquals("cold", strategy.getReplacedKey());
+    }
+
+    @Test
     void shouldTrackRecencyAfterReadsAndUpdates() {
         for (CacheStrategy<String> strategy : List.of(new LRUStrategy<String>(), new MRUStrategy<String>())) {
             strategy.onInsert("a");
