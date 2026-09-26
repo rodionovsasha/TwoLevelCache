@@ -1,5 +1,7 @@
 [![Build](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.rodionovsasha.cache/TwoLevelCache?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.rodionovsasha.cache/TwoLevelCache)
 [![Coverage Status](https://coveralls.io/repos/github/rodionovsasha/TwoLevelCache/badge.svg?branch=master)](https://coveralls.io/github/rodionovsasha/TwoLevelCache?branch=master)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.rodionovsasha.cache/TwoLevelCache?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.rodionovsasha.cache/TwoLevelCache)
 
 # TwoLevelCache
 
@@ -7,6 +9,16 @@
 
 - L1 is an in-memory cache for hot values.
 - L2 is a filesystem-backed cache that stores serialized values.
+
+## Installation
+
+```xml
+<dependency>
+    <groupId>io.github.rodionovsasha.cache</groupId>
+    <artifactId>TwoLevelCache</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 
 Writes go to every enabled level. A value found in L2 is promoted to L1. When L1 evicts a value, its L2 copy remains available. Each level has its own entry-count limit and eviction strategy (`LFU`, `LRU`, or `MRU`). Keys do not need to implement `Serializable`.
 
