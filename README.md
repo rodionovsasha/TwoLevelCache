@@ -17,18 +17,27 @@ import com.github.rodionovsasha.cache.TwoLevelCache;
 import com.github.rodionovsasha.cache.TwoLevelCacheConfig;
 import com.github.rodionovsasha.cache.strategies.StrategyType;
 
-try (var cache = new TwoLevelCache<String, String>(
-        new TwoLevelCacheConfig(100, 10_000, StrategyType.LRU, StrategyType.LFU))) {
-    cache.put("user:42", "cached value");
-    String value = cache.get("user:42");
-    cache.remove("user:42");
+final class CacheExample {
+    void useCache() {
+        try (var cache = new TwoLevelCache<String, String>(
+                new TwoLevelCacheConfig(100, 10_000, StrategyType.LRU, StrategyType.LFU))) {
+            cache.put("user:42", "cached value");
+            String value = cache.get("user:42");
+            cache.remove("user:42");
+        }
+    }
 }
 ```
 
 The compatibility constructors configure the same strategy for both levels:
 
 ```java
-var cache = new TwoLevelCache<String, String>(100, 10_000, StrategyType.LRU);
+final class CompatibilityExample {
+    void useCache() {
+        var cache = new TwoLevelCache<String, String>(100, 10_000, StrategyType.LRU);
+        cache.close();
+    }
+}
 ```
 
 `memoryCapacity` and `fileCapacity` are numbers of entries, not bytes. A zero capacity disables that level; both capacities cannot be zero. `getCacheSize()` reports logical keys, so an object present in both levels is counted once.

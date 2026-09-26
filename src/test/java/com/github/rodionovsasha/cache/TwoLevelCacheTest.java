@@ -6,6 +6,9 @@ import com.github.rodionovsasha.cache.strategies.StrategyType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -174,7 +177,6 @@ class TwoLevelCacheTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
     void shouldRemoveStaleDiskCopyAfterFailedUpdate() {
         try (var cache = new TwoLevelCache<Integer, Serializable>(1, 1)) {
             cache.put(1, "original");
@@ -213,8 +215,10 @@ class TwoLevelCacheTest {
     private static final class BrokenSerializable implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
-
-        private final Object nonSerializableValue = new Object();
+        @Serial
+        private void writeObject(ObjectOutputStream stream) throws IOException {
+            throw new NotSerializableException("Intentional test failure");
+        }
     }
 
     private static final class NonSerializableKey {

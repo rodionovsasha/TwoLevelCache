@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.NotSerializableException;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -30,11 +32,8 @@ class FileSystemCacheFailureTest {
     }
 
     @AfterEach
-    void tearDown() throws IOException {
-        if (Files.exists(directory)) {
-            cache.clearCache();
-            Files.delete(directory);
-        }
+    void tearDown() {
+        cache.close();
     }
 
     @Test
@@ -42,7 +41,11 @@ class FileSystemCacheFailureTest {
         var failure = new IOException("Directory unavailable");
         try (var files = mockStatic(Files.class)) {
             files.when(() -> Files.createTempDirectory("two-level-cache-")).thenThrow(failure);
-            var exception = assertThrows(IllegalStateException.class, () -> new FileSystemCache<>(1));
+            var exception = assertThrows(IllegalStateException.class, () -> {
+                try (var ignored = new FileSystemCache<>(1)) {
+                    // The constructor always throws in this test.
+                }
+            });
             assertSame(failure, exception.getCause());
         }
     }
@@ -113,7 +116,11 @@ class FileSystemCacheFailureTest {
 
     @Test
     void shouldRejectNegativeCapacityAndForgetEntryWhenDeletionFails() throws IOException {
-        assertThrows(IllegalArgumentException.class, () -> new FileSystemCache<Integer, String>(-1));
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (var ignored = new FileSystemCache<Integer, String>(-1)) {
+                // The constructor always throws in this test.
+            }
+        });
         cache.putToCache(1, "value");
         Path stored = storedFile();
         try (var files = mockStatic(Files.class, CALLS_REAL_METHODS)) {
@@ -132,7 +139,10 @@ class FileSystemCacheFailureTest {
     private static final class NonSerializableContent implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
-        private final Object value = new Object();
+        @Serial
+        private void writeObject(ObjectOutputStream stream) throws IOException {
+            throw new NotSerializableException("Intentional test failure");
+        }
     }
 
     private static final class UnreadableContent implements Serializable {
