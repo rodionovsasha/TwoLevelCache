@@ -1,7 +1,6 @@
 [![Build](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.rodionovsasha.cache/TwoLevelCache?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.rodionovsasha.cache/TwoLevelCache)
 [![Coverage Status](https://coveralls.io/repos/github/rodionovsasha/TwoLevelCache/badge.svg?branch=master)](https://coveralls.io/github/rodionovsasha/TwoLevelCache?branch=master)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.rodionovsasha.cache/TwoLevelCache?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.rodionovsasha.cache/TwoLevelCache)
 
 # TwoLevelCache
 
