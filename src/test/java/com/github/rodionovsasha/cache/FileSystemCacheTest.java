@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.IntStream;
@@ -108,11 +107,7 @@ public class FileSystemCacheTest {
     }
 
     private long getStoredFileCount() throws Exception {
-        Field tempDirField = FileSystemCache.class.getDeclaredField("tempDir");
-        tempDirField.setAccessible(true);
-        Path tempDir = (Path) tempDirField.get(fileSystemCache);
-
-        try (Stream<Path> files = Files.list(tempDir)) {
+        try (Stream<Path> files = Files.list(fileSystemCache.getStorageDirectory())) {
             return files.filter(Files::isRegularFile).count();
         }
     }

@@ -2,16 +2,16 @@ package com.github.rodionovsasha.cache;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.String.format;
@@ -21,67 +21,89 @@ import static java.lang.String.format;
  */
 
 @Slf4j
-final class FileSystemCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+final class FileSystemCache<K, V extends Serializable> implements Cache<K, V>, AutoCloseable {
     private final Map<K, String> objectsStorage;
-    private final Path tempDir;
-    private int capacity;
+    private final Path storageDirectory;
+    private final int capacity;
 
     FileSystemCache() {
-        this.tempDir = createTempDirectory();
-        this.tempDir.toFile().deleteOnExit();
-        this.objectsStorage = new ConcurrentHashMap<>();
+        this(Integer.MAX_VALUE, null);
     }
 
     FileSystemCache(int capacity) {
-        this.tempDir = createTempDirectory();
-        this.tempDir.toFile().deleteOnExit();
-        this.capacity = capacity;
-        this.objectsStorage = new ConcurrentHashMap<>(capacity);
+        this(capacity, null);
     }
 
-    private static Path createTempDirectory() {
+    FileSystemCache(int capacity, Path cacheRoot) {
+        if (capacity < 0) {
+            throw new IllegalArgumentException("Cache capacity must not be negative");
+        }
+        this.capacity = capacity;
+        this.objectsStorage = new ConcurrentHashMap<>(Math.min(capacity, 16));
+        this.storageDirectory = createStorageDirectory(cacheRoot);
+    }
+
+    private static Path createStorageDirectory(Path cacheRoot) {
         try {
-            return Files.createTempDirectory("cache");
+            if (cacheRoot == null) {
+                return Files.createTempDirectory("two-level-cache-");
+            }
+            Files.createDirectories(cacheRoot);
+            return Files.createTempDirectory(cacheRoot, "two-level-cache-");
         } catch (IOException e) {
             throw new IllegalStateException("Can't create cache temp directory", e);
         }
     }
 
+    Path getStorageDirectory() {
+        return storageDirectory;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public synchronized V getFromCache(K key) {
-        if (isObjectPresent(key)) {
-            var fileName = objectsStorage.get(key);
-            try (var fileInputStream = new FileInputStream(tempDir + File.separator + fileName);
-                 var objectInputStream = new ObjectInputStream(fileInputStream)) {
-                return (V) objectInputStream.readObject();
-            } catch (ClassNotFoundException | IOException e) {
-                log.error(format("Can't read a file. %s: %s", fileName, e.getMessage()));
-            }
+        var fileName = objectsStorage.get(key);
+        if (fileName == null) {
+            return null;
         }
-        log.debug(format("Object with key '%s' does not exist", key));
-        return null;
+        try (var inputStream = Files.newInputStream(storageDirectory.resolve(fileName));
+             var objectInputStream = new ObjectInputStream(inputStream)) {
+            return (V) objectInputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            log.error(format("Can't read cache file %s: %s", fileName, e.getMessage()));
+            removeFromCache(key);
+            return null;
+        }
+    }
+
+    synchronized boolean store(K key, V value) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(value, "value");
+        Path temporaryFile;
+        try {
+            temporaryFile = Files.createTempFile(storageDirectory, "entry-", ".bin");
+        } catch (IOException e) {
+            log.error("Can't create a cache file: " + e.getMessage());
+            return false;
+        }
+
+        try (var outputStream = new ObjectOutputStream(
+                Files.newOutputStream(temporaryFile, StandardOpenOption.WRITE))) {
+            outputStream.writeObject(value);
+            outputStream.flush();
+            var replacedFileName = objectsStorage.put(key, temporaryFile.getFileName().toString());
+            deleteFile(replacedFileName);
+            return true;
+        } catch (IOException e) {
+            log.error("Can't write an object to a file " + temporaryFile.getFileName() + ": " + e.getMessage());
+            deletePath(temporaryFile);
+            return false;
+        }
     }
 
     @Override
     public synchronized void putToCache(K key, V value) {
-        File tmpFile;
-        try {
-            tmpFile = Files.createTempFile(tempDir, "", "").toFile();
-        } catch (IOException e) {
-            log.error("Can't create a cache file: " + e.getMessage());
-            return;
-        }
-
-        try (var outputStream = new ObjectOutputStream(new FileOutputStream(tmpFile))) {
-            outputStream.writeObject(value);
-            outputStream.flush();
-            var replacedFileName = objectsStorage.put(key, tmpFile.getName());
-            deleteFile(replacedFileName);
-        } catch (IOException e) {
-            log.error("Can't write an object to a file " + tmpFile.getName() + ": " + e.getMessage());
-            deleteFile(tmpFile.getName());
-        }
+        store(key, value);
     }
 
     private void deleteFile(String fileName) {
@@ -89,11 +111,14 @@ final class FileSystemCache<K extends Serializable, V extends Serializable> impl
             return;
         }
 
-        var deletedFile = new File(tempDir + File.separator + fileName);
-        if (deletedFile.delete()) {
-            log.debug(format("Cache file '%s' has been deleted", fileName));
-        } else {
-            log.debug(format("Can't delete a file %s", fileName));
+        deletePath(storageDirectory.resolve(fileName));
+    }
+
+    private void deletePath(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            log.warn(format("Can't delete cache file %s: %s", path, e.getMessage()));
         }
     }
 
@@ -110,35 +135,38 @@ final class FileSystemCache<K extends Serializable, V extends Serializable> impl
     }
 
     @Override
-    public int getCacheSize() {
+    public synchronized int getCacheSize() {
         return objectsStorage.size();
     }
 
     @Override
-    public boolean isObjectPresent(K key) {
+    public synchronized boolean isObjectPresent(K key) {
         return objectsStorage.containsKey(key);
     }
 
     @Override
-    public boolean hasEmptyPlace() {
+    public synchronized boolean hasEmptyPlace() {
         return getCacheSize() < this.capacity;
     }
 
     @Override
-    public void clearCache() {
-        try (var files = Files.walk(tempDir)) {
+    public synchronized void clearCache() {
+        try (var files = Files.walk(storageDirectory)) {
             files.filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .forEach(file -> {
-                        if (file.delete()) {
-                            log.debug(format("Cache file '%s' has been deleted", file));
-                        } else {
-                            log.error(format("Can't delete a file %s", file));
-                        }
-                    });
+                    .forEach(this::deletePath);
         } catch (IOException e) {
-            log.error("Can't clear cache directory " + tempDir + ": " + e.getMessage());
+            log.error("Can't clear cache directory " + storageDirectory + ": " + e.getMessage());
         }
         objectsStorage.clear();
+    }
+
+    synchronized Set<K> keys() {
+        return Set.copyOf(objectsStorage.keySet());
+    }
+
+    @Override
+    public synchronized void close() {
+        clearCache();
+        deletePath(storageDirectory);
     }
 }

@@ -1,14 +1,14 @@
 package com.github.rodionovsasha.cache;
 
-import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
  * Copyright (©) 2014. Rodionov Aleksandr
  */
 
-class MemoryCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
+class MemoryCache<K, V> implements Cache<K, V> {
     private final Map<K, V> objectsStorage;
     private final int capacity;
 
@@ -50,5 +50,9 @@ class MemoryCache<K extends Serializable, V extends Serializable> implements Cac
     @Override
     public void clearCache() {
         objectsStorage.clear();
+    }
+
+    Set<K> keys() {
+        return Set.copyOf(objectsStorage.keySet());
     }
 }
