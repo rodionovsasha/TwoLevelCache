@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 
 class FileSystemCacheFailureTest {
     private FileSystemCache<Integer, Serializable> cache;
@@ -108,6 +109,18 @@ class FileSystemCacheFailureTest {
         try (var files = Files.list(directory)) {
             assertEquals(0, files.count());
         }
+    }
+
+    @Test
+    void shouldRejectNegativeCapacityAndForgetEntryWhenDeletionFails() throws IOException {
+        assertThrows(IllegalArgumentException.class, () -> new FileSystemCache<Integer, String>(-1));
+        cache.putToCache(1, "value");
+        Path stored = storedFile();
+        try (var files = mockStatic(Files.class, CALLS_REAL_METHODS)) {
+            files.when(() -> Files.deleteIfExists(stored)).thenThrow(new IOException("locked"));
+            cache.removeFromCache(1);
+        }
+        assertFalse(cache.isObjectPresent(1));
     }
 
     private Path storedFile() throws IOException {

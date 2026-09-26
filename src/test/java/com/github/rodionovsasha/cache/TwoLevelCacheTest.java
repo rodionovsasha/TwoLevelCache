@@ -92,6 +92,8 @@ class TwoLevelCacheTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new TwoLevelCacheConfig(-1, 1, StrategyType.LFU, StrategyType.LFU));
         assertThrows(IllegalArgumentException.class,
+                () -> new TwoLevelCacheConfig(1, -1, StrategyType.LFU, StrategyType.LFU));
+        assertThrows(IllegalArgumentException.class,
                 () -> new TwoLevelCacheConfig(0, 0, StrategyType.LFU, StrategyType.LFU));
         assertThrows(NullPointerException.class,
                 () -> new TwoLevelCacheConfig(1, 1, null, StrategyType.LFU));
@@ -168,6 +170,43 @@ class TwoLevelCacheTest {
         }
         try (var files = Files.list(root)) {
             assertEquals(0, files.count());
+        }
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void shouldRemoveStaleDiskCopyAfterFailedUpdate() {
+        try (var cache = new TwoLevelCache<Integer, Serializable>(1, 1)) {
+            cache.put(1, "original");
+            assertTrue(cache.put(1, new BrokenSerializable()));
+            assertFalse(cache.getSecondLevelCache().isObjectPresent(1));
+            assertFalse(cache.getSecondLevelStrategy().isObjectPresent(1));
+
+            try (var diskOnly = new TwoLevelCache<Integer, Serializable>(0, 1)) {
+                diskOnly.putToCache(1, new BrokenSerializable());
+                assertFalse(diskOnly.isObjectPresent(1));
+                diskOnly.put(2, "value");
+                assertFalse(diskOnly.put(3, new BrokenSerializable()));
+                assertEquals("value", diskOnly.get(2));
+            }
+        }
+    }
+
+    @Test
+    void shouldEvaluateBothLevelsForPresenceAndAvailableSpace() {
+        try (var cache = new TwoLevelCache<Integer, String>(1, 2)) {
+            cache.put(1, "one");
+            cache.getSecondLevelCache().removeFromCache(1);
+            assertTrue(cache.hasEmptyPlace());
+            assertTrue(cache.isObjectPresent(1));
+        }
+
+        try (var cache = new TwoLevelCache<Integer, String>(1, 2)) {
+            cache.put(1, "one");
+            cache.put(2, "two");
+            assertTrue(cache.isObjectPresent(1));
+            assertFalse(cache.isObjectPresent(99));
+            assertFalse(cache.hasEmptyPlace());
         }
     }
 

@@ -1,3 +1,6 @@
+[![Build](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/rodionovsasha/TwoLevelCache/actions/workflows/build.yml)
+[![Coverage Status](https://coveralls.io/repos/github/rodionovsasha/TwoLevelCache/badge.svg?branch=master)](https://coveralls.io/github/rodionovsasha/TwoLevelCache?branch=master)
+
 # TwoLevelCache
 
 `TwoLevelCache` caches serializable values in two independent levels:
